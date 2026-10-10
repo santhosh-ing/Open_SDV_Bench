@@ -39,7 +39,7 @@ Body zone ECU light control over CAN for open-sdv-bench, implementing the CAN co
 
 **Out of scope:** real CAN bus and transceiver wiring, mirror servo, diagnostics (UDS), CAN FD, bus-off recovery strategy (parking lot), E2E CRC protection (parking lot).
 
-**Traces to:** REQ-BODY-001 (hazard lights), REQ-BODY-002 (indicators), REQ-BODY-003 (low beam), REQ-BODY-004 (command loss fail-safe) — to be written in `docs/requirements/`.
+**Traces to:** SW-ZCS-001 (CAN contract), SW-ZCS-002 (command validation), SW-ZCS-003 (status transmission), SW-ZCS-010 (outputs follow requests), SW-ZCS-011 (blink timing), SW-ZCS-020 (ECU states), SW-ZCS-021 (command timeout), SW-ZCS-022 (heartbeat) — see `docs/requirements/30-zc-stm32-requirements.sdoc`.
 
 **Acceptance (verified by the maintainer on the board):**
 - Each button press steps through the scenarios, and the LEDs show exactly the expected pattern for each.

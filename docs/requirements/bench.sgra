@@ -1,0 +1,61 @@
+[GRAMMAR]
+ELEMENTS:
+- TAG: SECTION
+  PROPERTIES:
+    IS_COMPOSITE: True
+  FIELDS:
+  - TITLE: UID
+    TYPE: String
+    REQUIRED: False
+  - TITLE: TITLE
+    TYPE: String
+    REQUIRED: True
+- TAG: TEXT
+  FIELDS:
+  - TITLE: UID
+    TYPE: String
+    REQUIRED: False
+  - TITLE: STATEMENT
+    TYPE: String
+    REQUIRED: True
+- TAG: REQUIREMENT
+  FIELDS:
+  - TITLE: UID
+    TYPE: String
+    REQUIRED: True
+  - TITLE: STATUS
+    TYPE: SingleChoice(Draft, Agreed, Implemented, Verified, Obsolete)
+    REQUIRED: True
+  - TITLE: KIND
+    TYPE: SingleChoice(Functional, Non-functional, Constraint)
+    REQUIRED: True
+  - TITLE: ALLOCATED_TO
+    TYPE: String
+    REQUIRED: False
+  - TITLE: VERIFICATION
+    TYPE: SingleChoice(Test, Demonstration, Inspection, Analysis)
+    REQUIRED: True
+  - TITLE: MILESTONE
+    TYPE: String
+    REQUIRED: False
+  - TITLE: RELEVANCE
+    TYPE: MultipleChoice(Safety, Security)
+    REQUIRED: False
+  - TITLE: LEGACY_ID
+    TYPE: String
+    REQUIRED: False
+  - TITLE: TITLE
+    TYPE: String
+    REQUIRED: True
+  - TITLE: STATEMENT
+    TYPE: String
+    REQUIRED: True
+  - TITLE: RATIONALE
+    TYPE: String
+    REQUIRED: False
+  - TITLE: COMMENT
+    TYPE: String
+    REQUIRED: False
+  RELATIONS:
+  - TYPE: Parent
+  - TYPE: File

@@ -22,4 +22,5 @@ RUN pip install --no-cache-dir \
         kuksa-client \
         python-can \
         udsoncan \
-        can-isotp
+        can-isotp \
+        strictdoc==0.30.2

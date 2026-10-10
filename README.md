@@ -98,6 +98,7 @@ Firmware flashing (STM32Cube for VS Code, ST-LINK over USB) runs on your host, n
 
 - **Contracts first**: CAN, signal and diagnostic interfaces are defined in `interfaces/` before any implementation.
 - **Spec-driven development** with [GitHub Spec Kit](https://github.com/github/spec-kit) (pinned to v1.1.3): each feature goes from spec → plan → tasks → implementation, then verification on real hardware. Inputs for each spec are kept in `docs/spec-inputs/`.
+- **Requirements as objects**: a stakeholder → system → function → component hierarchy in [StrictDoc](docs/requirements/README.md), with stable IDs, CI-checked links, test coverage and ReqIF export.
 - **Decisions are recorded** as ADRs in `docs/adr/`.
 - **Views like an E/E architecture tool**: requirements, logical, software, network and deployment views in `docs/architecture/`.
 - Rules for AI coding assistants: [AGENTS.md](AGENTS.md).

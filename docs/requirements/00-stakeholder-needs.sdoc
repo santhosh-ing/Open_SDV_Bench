@@ -1,0 +1,61 @@
+[DOCUMENT]
+TITLE: 00 Stakeholder needs
+
+[GRAMMAR]
+IMPORT_FROM_FILE: bench.sgra
+
+[TEXT]
+STATEMENT: >>>
+Level 0 of the requirement hierarchy: what drivers, other road users, service engineers and developers need from the vehicle, in their own language. Every system requirement traces to at least one stakeholder need. IDs: STK-NNN.
+<<<
+
+[REQUIREMENT]
+UID: STK-001
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Demonstration
+TITLE: Signal intention to other road users
+STATEMENT: >>>
+The driver can signal an intended change of direction, and warn other road users of a hazard, in a way they recognise immediately.
+<<<
+
+[REQUIREMENT]
+UID: STK-002
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Demonstration
+TITLE: See and be seen
+STATEMENT: >>>
+The driver can switch on the vehicle's low beam so that the vehicle is visible to others.
+<<<
+
+[REQUIREMENT]
+UID: STK-003
+STATUS: Draft
+KIND: Non-functional
+VERIFICATION: Demonstration
+RELEVANCE: Safety
+TITLE: Predictable behaviour when something fails
+STATEMENT: >>>
+When a component or its communication fails, the vehicle stays in a predictable, visible state, and the failure is made known instead of being hidden.
+<<<
+
+[REQUIREMENT]
+UID: STK-004
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Demonstration
+TITLE: Diagnose the vehicle without opening it
+STATEMENT: >>>
+A service engineer, at the vehicle or remotely, can read the status and faults of every vehicle node through standard diagnostic interfaces.
+<<<
+
+[REQUIREMENT]
+UID: STK-005
+STATUS: Draft
+KIND: Non-functional
+VERIFICATION: Demonstration
+TITLE: Evolve functions independently of hardware
+STATEMENT: >>>
+Engineers can change, test and update vehicle functions without being tied to a specific hardware unit, including running the whole vehicle without hardware.
+<<<

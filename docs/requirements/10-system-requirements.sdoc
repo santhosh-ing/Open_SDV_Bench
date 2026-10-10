@@ -1,0 +1,146 @@
+[DOCUMENT]
+TITLE: 10 System requirements
+
+[GRAMMAR]
+IMPORT_FROM_FILE: bench.sgra
+
+[TEXT]
+STATEMENT: >>>
+Level 1: what the vehicle as a whole shall do, independent of how it is split into functions and nodes. Verified by system tests on the bench. IDs: SYS-<AREA>-NNN. Each traces to a stakeholder need (STK).
+<<<
+
+[[SECTION]]
+TITLE: Exterior lighting
+
+[REQUIREMENT]
+UID: SYS-LIGHT-001
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+MILESTONE: M1
+TITLE: Direction indication
+STATEMENT: >>>
+The vehicle shall provide left and right direction indication on request.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: STK-001
+
+[REQUIREMENT]
+UID: SYS-LIGHT-002
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+MILESTONE: M1
+RELEVANCE: Safety
+TITLE: Hazard warning
+STATEMENT: >>>
+The vehicle shall provide a hazard warning signal on request, which takes priority over direction indication.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: STK-001
+
+[REQUIREMENT]
+UID: SYS-LIGHT-003
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+TITLE: Comfort blink
+STATEMENT: >>>
+The vehicle shall provide comfort blink: a short direction request produces a configured number of indication flashes.
+<<<
+RATIONALE: >>>
+Lane-change convenience offered by most production vehicles; the number of flashes is market-specific and therefore configurable (variant coding).
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: STK-001
+
+[REQUIREMENT]
+UID: SYS-LIGHT-004
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+MILESTONE: M1
+TITLE: Low beam
+STATEMENT: >>>
+The vehicle shall switch its low beam on and off on request.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: STK-002
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Robustness and safe behaviour
+
+[REQUIREMENT]
+UID: SYS-SAFE-001
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+MILESTONE: M1
+RELEVANCE: Safety
+TITLE: Defined degraded lighting state
+STATEMENT: >>>
+If a lighting node loses its commands, the vehicle shall enter a defined degraded lighting state that keeps the vehicle visible, and shall report that it is degraded.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: STK-003
+
+[REQUIREMENT]
+UID: SYS-SAFE-002
+STATUS: Draft
+KIND: Non-functional
+VERIFICATION: Analysis
+MILESTONE: M1
+RELEVANCE: Safety
+TITLE: Deterministic node behaviour
+STATEMENT: >>>
+Every vehicle node shall behave deterministically and repeatably during start-up and normal operation.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: STK-003
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Diagnostics
+
+[REQUIREMENT]
+UID: SYS-DIAG-001
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+MILESTONE: M3
+TITLE: Diagnostic access to every node
+STATEMENT: >>>
+Every vehicle node shall provide its status and detected faults through a diagnostic interface.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: STK-004
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Architecture
+
+[REQUIREMENT]
+UID: SYS-ARCH-001
+STATUS: Draft
+KIND: Constraint
+VERIFICATION: Inspection
+TITLE: Functions decoupled from hardware
+STATEMENT: >>>
+Vehicle functions shall be decoupled from the hardware they run on, so that a hardware node can be replaced by its virtual twin without changing the functions.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: STK-005
+
+[[/SECTION]]

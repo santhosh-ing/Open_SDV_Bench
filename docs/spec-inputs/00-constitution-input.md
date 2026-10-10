@@ -19,9 +19,10 @@ Create the constitution for **open-sdv-bench**, an open-source desktop software-
 - Code never hard-codes CAN IDs, bit positions, scaling or signal values. CAN pack/unpack code is GENERATED from the DBC (cantools `generate_c_source` for C, cantools for Python) and committed under a `generated/` folder that is never edited by hand.
 
 ### II. Traceability
-- System requirements live in `docs/requirements/` with IDs `REQ-<AREA>-<NNN>` (e.g. REQ-BODY-001).
-- Every feature spec states which REQ IDs it implements. Every test states which requirement (REQ or FR) it verifies.
-- Commit messages reference the spec number and/or REQ ID.
+- Requirements live in `docs/requirements/` as StrictDoc files in a hierarchy: stakeholder needs (`STK-NNN`), system (`SYS-<AREA>-NNN`), function (`FUN-<AREA>-NNN`) and component requirements (`SW|HW-<NODE>-NNN`, e.g. `SW-ZCS-021`). They change only through pull requests checked by CI.
+- Every feature spec states which requirement IDs it implements. Every test carries `@verifies <ID>` for the requirements it verifies.
+- Requirement IDs are never invented in specs or code: a missing requirement is added to `docs/requirements/` first.
+- Commit messages reference the spec number and/or requirement ID.
 
 ### III. Layered firmware architecture
 For every microcontroller ECU (first: `ecus/body-zone-stm32/`):

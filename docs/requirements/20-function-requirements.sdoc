@@ -1,0 +1,136 @@
+[DOCUMENT]
+TITLE: 20 Function requirements
+
+[GRAMMAR]
+IMPORT_FROM_FILE: bench.sgra
+
+[TEXT]
+STATEMENT: >>>
+Level 2: behaviour of the logical functions (see docs/architecture/logical/), still independent of the node a function runs on. Verified by integration tests against the HPC and the virtual twins. IDs: FUN-<AREA>-NNN. Each traces to a system requirement (SYS). Allocation to a node happens one level down.
+<<<
+
+[[SECTION]]
+TITLE: Indicator and hazard function
+
+[REQUIREMENT]
+UID: FUN-LIGHT-001
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+MILESTONE: M1
+TITLE: Indicator flashing
+STATEMENT: >>>
+When the left or the right indicator is requested and no hazard is requested, the indicator function shall flash only the requested side at 1.5 Hz with a 50 % duty cycle.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-LIGHT-001
+
+[REQUIREMENT]
+UID: FUN-LIGHT-002
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+MILESTONE: M1
+RELEVANCE: Safety
+TITLE: Hazard priority
+STATEMENT: >>>
+While the hazard warning is requested, the indicator function shall flash both sides in phase, regardless of any left or right indicator request.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-LIGHT-002
+
+[REQUIREMENT]
+UID: FUN-LIGHT-003
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+MILESTONE: M1
+TITLE: Invalid indicator combination
+STATEMENT: >>>
+If the left and the right indicator are requested at the same time without a hazard request, the indicator function shall flash neither side.
+<<<
+COMMENT: >>>
+Open question from spec 002 (to be settled in /speckit-clarify): confirm this behaviour.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-LIGHT-001
+
+[REQUIREMENT]
+UID: FUN-LIGHT-010
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+TITLE: Comfort blink
+STATEMENT: >>>
+When the driver taps a direction request for less than 0.5 s, the indicator function shall flash the selected side the coded number of times (default 3).
+<<<
+RATIONALE: >>>
+Lane-change convenience; the number of flashes is market-specific (variant coding).
+<<<
+COMMENT: >>>
+Node allocation not decided yet (stalk input on the HPC or edge logic on the ZC-STM32); no component requirement exists until it is.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-LIGHT-003
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Low beam function
+
+[REQUIREMENT]
+UID: FUN-LIGHT-004
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+MILESTONE: M1
+TITLE: Low beam switching
+STATEMENT: >>>
+While low beam is requested, the low beam function shall keep the low beam on; otherwise it shall keep it off.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-LIGHT-004
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Fail-safe and fault reporting
+
+[REQUIREMENT]
+UID: FUN-SAFE-001
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+MILESTONE: M1
+RELEVANCE: Safety
+TITLE: Command-loss fail-safe
+STATEMENT: >>>
+If no valid light command has been received for 500 ms or longer, the lighting functions shall switch the indicators off, switch the low beam on and report a degraded state; when valid commands return, they shall resume normal behaviour automatically.
+<<<
+RATIONALE: >>>
+Low beam on keeps the vehicle visible; indicators off avoids signalling a direction nobody requested. The 500 ms timeout is five missed 100 ms command cycles (ADR 0002).
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-SAFE-001
+
+[REQUIREMENT]
+UID: FUN-DIAG-001
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+MILESTONE: M1
+TITLE: Actual state and fault reporting
+STATEMENT: >>>
+The lighting functions shall report their actual lamp states, their operating state and detected faults to the rest of the vehicle and to diagnostic access.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-DIAG-001
+
+[[/SECTION]]

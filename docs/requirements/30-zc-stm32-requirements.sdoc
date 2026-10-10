@@ -1,0 +1,248 @@
+[DOCUMENT]
+TITLE: 30 ZC-STM32 component requirements
+
+[GRAMMAR]
+IMPORT_FROM_FILE: bench.sgra
+
+[TEXT]
+STATEMENT: >>>
+Level 3: requirements allocated to the body zone controller (ZC-STM32, STM32F407G-DISC1). Verified by host unit tests and by tests on the board. IDs: SW-ZCS-NNN (software) and HW-ZCS-NNN (hardware). Each traces to a function requirement (FUN) or, for constraints, to a system requirement (SYS). Spec Kit specs implement these IDs.
+<<<
+
+[[SECTION]]
+TITLE: CAN communication
+
+[REQUIREMENT]
+UID: SW-ZCS-001
+STATUS: Draft
+KIND: Constraint
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Test
+MILESTONE: M1
+LEGACY_ID: REQ-BODY-002
+TITLE: CAN contract conformance
+STATEMENT: >>>
+The ZC-STM32 shall accept and transmit only the CAN frames defined in the body CAN contract (interfaces/can/body.dbc).
+<<<
+RATIONALE: >>>
+The DBC is the single source of truth for CAN communication; pack/unpack code is generated from it.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-ARCH-001
+
+[REQUIREMENT]
+UID: SW-ZCS-002
+STATUS: Draft
+KIND: Functional
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Test
+MILESTONE: M1
+RELEVANCE: Safety
+TITLE: Light command validation
+STATEMENT: >>>
+The ZC-STM32 shall use the signals of BODY_LightCmd only after validating its CAN ID, a DLC of 8 and its alive counter.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: FUN-SAFE-001
+
+[REQUIREMENT]
+UID: SW-ZCS-003
+STATUS: Draft
+KIND: Functional
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Test
+MILESTONE: M1
+TITLE: Light status transmission
+STATEMENT: >>>
+The ZC-STM32 shall transmit BODY_LightStatus every 100 ms ± 10 ms with the actual lamp states, blink phase, command-timeout flag, ECU state and a rolling alive counter.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: FUN-DIAG-001
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Light functions
+
+[REQUIREMENT]
+UID: SW-ZCS-010
+STATUS: Draft
+KIND: Functional
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Test
+MILESTONE: M1
+LEGACY_ID: REQ-BODY-001
+TITLE: Light outputs follow CAN requests
+STATEMENT: >>>
+The ZC-STM32 shall control its hazard, left indicator, right indicator and low beam outputs according to the requests in BODY_LightCmd, within one 100 ms command cycle.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: FUN-LIGHT-001
+- TYPE: Parent
+  VALUE: FUN-LIGHT-002
+- TYPE: Parent
+  VALUE: FUN-LIGHT-003
+- TYPE: Parent
+  VALUE: FUN-LIGHT-004
+
+[REQUIREMENT]
+UID: SW-ZCS-011
+STATUS: Draft
+KIND: Functional
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Test
+MILESTONE: M1
+TITLE: Blink timing
+STATEMENT: >>>
+The ZC-STM32 shall blink indicator outputs at 1.5 Hz with a 50 % duty cycle, and left and right outputs blinking at the same time shall be in phase.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: FUN-LIGHT-001
+- TYPE: Parent
+  VALUE: FUN-LIGHT-002
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: ECU states and fail-safe
+
+[REQUIREMENT]
+UID: SW-ZCS-020
+STATUS: Draft
+KIND: Functional
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Test
+MILESTONE: M1
+RELEVANCE: Safety
+LEGACY_ID: REQ-BODY-003
+TITLE: Explicit ECU states
+STATEMENT: >>>
+The ZC-STM32 shall implement the explicit ECU states Init, Normal, Degraded and Fault with defined transitions, and shall report the current state on the bus.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: FUN-SAFE-001
+- TYPE: Parent
+  VALUE: FUN-DIAG-001
+
+[REQUIREMENT]
+UID: SW-ZCS-021
+STATUS: Draft
+KIND: Functional
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Test
+MILESTONE: M1
+RELEVANCE: Safety
+TITLE: Command timeout handling
+STATEMENT: >>>
+If no valid BODY_LightCmd has been received for 500 ms or longer, the ZC-STM32 shall enter state Degraded, switch the indicator outputs off, switch the low beam output on and set CmdTimeout; when valid commands return, it shall return to state Normal.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: FUN-SAFE-001
+
+[REQUIREMENT]
+UID: SW-ZCS-022
+STATUS: Draft
+KIND: Functional
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Demonstration
+MILESTONE: M1
+TITLE: Heartbeat indication
+STATEMENT: >>>
+The ZC-STM32 shall blink its heartbeat LED at 1 Hz in state Normal and at 4 Hz in state Degraded.
+<<<
+RATIONALE: >>>
+Makes the ECU state visible on the bench without a debugger.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: FUN-DIAG-001
+
+[REQUIREMENT]
+UID: SW-ZCS-023
+STATUS: Draft
+KIND: Non-functional
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Analysis
+MILESTONE: M1
+RELEVANCE: Safety
+LEGACY_ID: REQ-SYS-001
+TITLE: Deterministic start-up and operation
+STATEMENT: >>>
+The ZC-STM32 shall behave deterministically during start-up and normal operation: fixed task periods from a 1 ms time base, no dynamic memory allocation and no blocking waits in application code.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-SAFE-002
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Diagnostics
+
+[REQUIREMENT]
+UID: SW-ZCS-030
+STATUS: Draft
+KIND: Functional
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Test
+MILESTONE: M3
+LEGACY_ID: REQ-DIAG-001
+TITLE: Diagnostic interface
+STATEMENT: >>>
+The ZC-STM32 shall provide a UDS diagnostic interface for status and fault reporting as defined in interfaces/diag/body_ecu.yaml.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: FUN-DIAG-001
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Software architecture constraints
+
+[REQUIREMENT]
+UID: SW-ZCS-040
+STATUS: Draft
+KIND: Constraint
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Inspection
+MILESTONE: M1
+LEGACY_ID: REQ-SW-001
+TITLE: Generated code kept separate
+STATEMENT: >>>
+The ZC-STM32 software shall keep generated code (STM32CubeMX output, DBC code generation) separate from hand-written application code.
+<<<
+RATIONALE: >>>
+Regenerating code must never overwrite project code.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-ARCH-001
+
+[REQUIREMENT]
+UID: SW-ZCS-041
+STATUS: Draft
+KIND: Constraint
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Inspection
+MILESTONE: M1
+LEGACY_ID: REQ-SW-002
+TITLE: Layered software architecture
+STATEMENT: >>>
+The ZC-STM32 software shall be structured in the layers functions, com, diag, bsp and sched, where each layer only calls the layers below it and only bsp and com call the hardware abstraction layer.
+<<<
+RATIONALE: >>>
+The same function logic then runs unchanged in the virtual twin and in host unit tests (ADR 0001).
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-ARCH-001
+
+[[/SECTION]]

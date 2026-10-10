@@ -32,7 +32,7 @@ Body zone ECU bring-up for the open-sdv-bench body ECU (STM32F407G-DISC1 board).
 
 **Out of scope:** CAN communication, servo, diagnostics, low-power modes, watchdog (parking lot).
 
-**Traces to:** foundation for REQ-BODY-* (light functions); no direct system requirement.
+**Traces to:** SW-ZCS-023 (deterministic start-up and operation), SW-ZCS-040 (generated code kept separate), SW-ZCS-041 (layered architecture); foundation for the light functions SW-ZCS-010 ff.
 
 **Acceptance (verified by the maintainer on the board):**
 - After reset: 1 s all LEDs on → all off → blue blinks at 1 Hz.
