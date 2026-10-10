@@ -1,7 +1,7 @@
-# Input for `/speckit.constitution`
+# Input for `/speckit-constitution`
 
 Paste everything below the line into your agent chat after the command:
-`/speckit.constitution <paste here>`
+`/speckit-constitution <paste here>`
 
 Review it first like an architect — change anything that doesn't match how you want to work.
 After Spec Kit writes `.specify/memory/constitution.md`, read the result and correct it by hand if needed.
@@ -61,7 +61,7 @@ For every microcontroller ECU (first: `ecus/body-zone-stm32/`):
 - Toolchain: STM32CubeMX (+ STM32Cube for VS Code extension), CMake, arm-none-eabi-gcc, ST HAL.
 
 ## Development workflow
-- Spec-driven: `/speckit.specify` (what & why) → `/speckit.clarify` → `/speckit.plan` (how) → `/speckit.tasks` → `/speckit.implement` → verification on hardware by the maintainer.
+- Spec-driven: `/speckit-specify` (what & why) → `/speckit-clarify` → `/speckit-plan` (how) → `/speckit-tasks` → `/speckit-implement` → verification on hardware by the maintainer.
 - One feature in progress at a time. Ideas outside the current spec go to a GitHub issue labelled `parking-lot`.
 - Work happens on a feature branch per spec, merged to `main` via pull request.
 

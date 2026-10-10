@@ -1,22 +1,11 @@
 # CLAUDE
 
-This repository is intended for body ECU and vehicle integration work.
+All project rules for AI assistants live in **[AGENTS.md](AGENTS.md)**. Read it first and follow it; it is the single source of truth (shared with Codex and other tools).
 
-## Mission
+Most important guardrails, repeated here for quick reference:
 
-- Define vehicle-facing contracts before firmware work begins.
-- Keep generated CubeMX output separate from hand-written application logic.
-- Use feature folders in `specs/` to drive incremental design work.
-
-## Required structure
-
-- `specs/` — each feature should get a numbered folder.
-- `docs/` — system requirements and architecture artifacts.
-- `interfaces/` — contracts expressed in DBC and YAML.
-- `ecus/<target>/app/` — product code layered by responsibility.
-
-## Guardrails
-
-- Do not hand-edit generated code under `Core/` or `Drivers/`.
-- Keep the DBC and diagnostic definitions authoritative sources for CAN and UDS behavior.
-- Prefer clear function boundaries in `bsp/`, `com/`, `diag/`, and `functions/`.
+- `interfaces/` holds contracts (DBC, VSS, diagnostics). Change them only together with an ADR and a version bump.
+- Never hand-edit CubeMX output (`Core/`, `Drivers/`, `.ioc`) or generated CAN code (`app/com/generated/`).
+- Firmware layers call downward only: `functions` → `com` / `bsp` → HAL. No HAL calls in `functions/`.
+- Every feature traces to `REQ-*` IDs in `docs/requirements/`.
+- Feature work follows Spec Kit (`/speckit-*`) and lives in `specs/NNN-name/`.
