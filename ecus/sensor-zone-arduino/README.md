@@ -1,3 +1,3 @@
-# Sensor zone ECU – Arduino (milestone M5)
+# Sensor zone controller – Arduino (milestone M5)
 
-Arduino + MCP2515 CAN module. Reads a potentiometer ("vehicle speed") and a distance sensor and sends them on CAN according to a contract in `interfaces/can/`. Built with PlatformIO.
+Arduino + Ethernet shield. Reads a potentiometer ("vehicle speed") and a distance sensor and publishes them to the central HPC over Ethernet (MQTT), according to a contract in `interfaces/`. Built with PlatformIO. Topology: [ADR 0003](../../docs/adr/0003-bench-network-topology.md).

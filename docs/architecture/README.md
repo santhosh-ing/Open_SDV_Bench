@@ -15,11 +15,11 @@ Inspired by the layers of an E/E architecture tool (requirements → logical →
 
 ## 1. Introduction and goals
 
-A desktop software-defined-vehicle bench that demonstrates a realistic zone architecture: zone ECUs on CAN, a central vehicle computer with Eclipse SDV components (Kuksa Databroker + VSS, Eclipse OpenSOVD), and an ADAS domain. Quality goals: traceability, modularity, runnable without hardware (virtual twins).
+A desktop software-defined-vehicle bench that demonstrates a realistic SDV architecture: a central vehicle computer with Eclipse SDV components (Kuksa Databroker + VSS, Eclipse OpenSOVD, Ankaios), zone controllers on CAN and Ethernet, an ADAS domain, and a cloud backend for OTA and remote diagnostics (ADR 0003). Quality goals: traceability, modularity, runnable without hardware (virtual twins).
 
 ## 2. Constraints
 
-Hobby hardware (STM32F407G-DISC1, Raspberry Pi 5, Arduino, Jetson Orin), open-source software only, CAN classic at 500 kbit/s.
+Hobby hardware (STM32F407G-DISC1, Raspberry Pi 5, Arduino, Jetson Orin), open-source software only, CAN classic at 500 kbit/s and 100 Mbit Ethernet.
 
 ## 3. Context and scope
 
@@ -27,7 +27,7 @@ Hobby hardware (STM32F407G-DISC1, Raspberry Pi 5, Arduino, Jetson Orin), open-so
 
 ## 4. Solution strategy
 
-Contracts first (`interfaces/`), spec-driven development (Spec Kit), layered firmware (ADR 0001), command/status CAN split (ADR 0002), virtual twin per ECU.
+Contracts first (`interfaces/`), spec-driven development (Spec Kit), layered firmware (ADR 0001), command/status CAN split (ADR 0002), central HPC star with CAN and Ethernet links and a cloud tier (ADR 0003), virtual twin per ECU.
 
 ## 5. Building block view
 
