@@ -8,7 +8,7 @@ After Spec Kit writes `.specify/memory/constitution.md`, read the result and cor
 
 ---
 
-Create the constitution for **open-sdv-bench**, an open-source desktop software-defined-vehicle (SDV) bench. It shows a realistic automotive E/E architecture on hobby hardware: zone ECUs (STM32, Arduino) on CAN, a central vehicle computer (Raspberry Pi 5) running Eclipse SDV components (Kuksa Databroker with COVESA VSS, Eclipse OpenSOVD), and an ADAS domain (NVIDIA Jetson Orin). The project is developed with systems-engineering discipline: requirements, architecture, decisions and traceability are first-class. The maintainer is a systems architect, not a professional programmer — code must be readable and explained.
+Create the constitution for **open-sdv-bench**, an open-source desktop software-defined-vehicle (SDV) bench. It shows a realistic automotive E/E architecture on hobby hardware: a central vehicle computer (Raspberry Pi 5) running Eclipse SDV components (Kuksa Databroker with COVESA VSS, Eclipse OpenSOVD), an STM32 body zone controller on CAN, an Arduino sensor zone controller and an ADAS domain (NVIDIA Jetson Orin) on Ethernet, and a cloud backend over IP (see ADR 0003). The project is developed with systems-engineering discipline: requirements, architecture, decisions and traceability are first-class. The maintainer is a systems architect, not a professional programmer — code must be readable and explained.
 
 ## Core principles
 

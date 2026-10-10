@@ -4,7 +4,7 @@ Single source of rules for every AI coding assistant working in this repository 
 
 ## Project
 
-**Open SDV Bench** is an open-source desktop software-defined-vehicle bench: zone ECUs (STM32, Arduino) on CAN, a central vehicle computer (Raspberry Pi 5) running Eclipse SDV components (Kuksa Databroker + COVESA VSS, Eclipse OpenSOVD), and an ADAS domain (NVIDIA Jetson Orin). It is developed with systems-engineering discipline: requirements, architecture, decisions and traceability are first-class.
+**Open SDV Bench** is an open-source desktop software-defined-vehicle bench: a central vehicle computer (Raspberry Pi 5) running Eclipse SDV components (Kuksa Databroker + COVESA VSS, Eclipse OpenSOVD, later Ankaios), connected to an STM32 body zone controller over CAN, an Arduino sensor zone controller and an ADAS domain (NVIDIA Jetson Orin) over Ethernet, and a cloud backend (OpenSDV.Cloud) over IP. Topology: ADR 0003. It is developed with systems-engineering discipline: requirements, architecture, decisions and traceability are first-class.
 
 The maintainer is a systems architect, not a professional programmer. Explain non-obvious embedded concepts briefly in comments or plans.
 
