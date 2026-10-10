@@ -1,0 +1,42 @@
+name: contracts-and-docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install tools
+        run: pip install cantools pyyaml
+
+      - name: Validate CAN contract (DBC)
+        run: python3 -m cantools dump interfaces/can/body.dbc
+
+      - name: Validate YAML contracts
+        run: |
+          python3 - <<'EOF'
+          import pathlib, sys, yaml
+          failed = False
+          for f in sorted(pathlib.Path("interfaces").rglob("*.y*ml")):
+              try:
+                  yaml.safe_load(f.read_text())
+                  print(f"OK    {f}")
+              except yaml.YAMLError as e:
+                  print(f"ERROR {f}: {e}")
+                  failed = True
+          sys.exit(1 if failed else 0)
+          EOF
+
+      - name: Generate CAN code and compile it
+        run: |
+          tools/gen_can.sh "$RUNNER_TEMP/can-gen"
+          gcc -std=c11 -Wall -Wextra -Werror -c "$RUNNER_TEMP/can-gen/body.c" -o "$RUNNER_TEMP/can-gen/body.o"

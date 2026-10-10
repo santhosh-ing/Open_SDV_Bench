@@ -1,27 +1,60 @@
+# Diagnostic description of the body zone ECU (contract).
+# Status: DRAFT – detailed in milestone M3 (classic UDS) and consumed by the
+# OpenSOVD classic diagnostic adapter in M4. Changes need an ADR + version bump.
+# Signal names refer to interfaces/can/body.dbc v0.1.0.
+
 ecu:
   name: body-zone-stm32
-  protocol: uds
+  protocol: UDS (ISO 14229-1) over ISO-TP (ISO 15765-2)
   version: 0.1.0
+  can:
+    # Proposed diagnostic IDs. To be added to the DBC in M3 via ADR.
+    physical_request_id: 0x740
+    response_id: 0x748
+    functional_request_id: 0x7DF
+    bitrate: 500000
+
+sessions:
+  - { id: 0x01, name: default }
+  - { id: 0x03, name: extended }
+
+security_levels:
+  - level: 0x01          # seed request 0x27 01, key send 0x27 02
+    protects: [routine 0x0202]
+    algorithm: placeholder (simple XOR for the bench, documented in M3)
 
 services:
-  - id: 0x10
-    name: DiagnosticSessionControl
-    description: Switch between default and extended diagnostic sessions.
+  - { id: 0x10, name: DiagnosticSessionControl, sessions: [default, extended] }
+  - { id: 0x22, name: ReadDataByIdentifier,     sessions: [default, extended] }
+  - { id: 0x19, name: ReadDTCInformation,       sessions: [default, extended], subfunctions: [0x01, 0x02] }
+  - { id: 0x14, name: ClearDiagnosticInformation, sessions: [default, extended] }
+  - { id: 0x31, name: RoutineControl,           sessions: [extended] }
+  - { id: 0x27, name: SecurityAccess,           sessions: [extended] }
+  - { id: 0x3E, name: TesterPresent,            sessions: [default, extended] }
 
-  - id: 0x19
-    name: ReadDTCInformation
-    description: Return active faults and warnings for body output channels.
+data_identifiers:
+  - { did: 0xF190, name: VIN,              type: ascii, length: 17 }
+  - { did: 0xF189, name: SoftwareVersion,  type: ascii, length: 8 }
+  - { did: 0xF18C, name: EcuSerialNumber,  type: ascii, length: 10 }
+  - did: 0x0100
+    name: LampStates
+    type: bitfield
+    length: 1
+    bits:   # same meaning as BODY_LightStatus signals
+      0: HazardActive
+      1: IndicatorLeftActive
+      2: IndicatorRightActive
+      3: LowBeamActive
+  - { did: 0x0101, name: EcuState,        type: enum, length: 1, values: { 0: Init, 1: Normal, 2: Degraded, 3: Fault } }
+  - { did: 0x0102, name: CanRxCounters,   type: uint16x2, length: 4, description: "valid frames, alive-counter errors" }
 
-  - id: 0x22
-    name: ReadDataByIdentifier
-    description: Return status of hazard, indicator, and mirror channels.
+routines:
+  - { rid: 0x0201, name: LampTest,       description: "All lamps on for 1 s, then restore" }
+  - { rid: 0x0202, name: ServoSelfTest,  description: "Move mirror servo end to end (servo milestone)", security_level: 0x01 }
 
-  - id: 0x2E
-    name: WriteDataByIdentifier
-    description: Set configuration values for body output behavior.
-
-signals:
-  hazard_state: { type: bool, default: false }
-  left_indicator_state: { type: bool, default: false }
-  right_indicator_state: { type: bool, default: false }
-  mirror_heat_state: { type: bool, default: false }
+dtcs:
+  # 3-byte DTC numbers are bench-specific proposals, finalized in M3.
+  - { dtc: 0x9A0113, name: LampLeftOpenCircuit,   status: proposed, detection: "simulated via button / debugger" }
+  - { dtc: 0x9A0213, name: LampRightOpenCircuit,  status: proposed, detection: "simulated via button / debugger" }
+  - { dtc: 0x9A1071, name: MirrorServoStalled,    status: proposed, detection: "servo milestone" }
+  - { dtc: 0xC10087, name: LightCmdMissing,       status: proposed, detection: "BODY_LightCmd timeout >= 500 ms (CmdTimeout = 1)" }

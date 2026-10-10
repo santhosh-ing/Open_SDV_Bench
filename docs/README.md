@@ -1,10 +1,12 @@
 # Documentation
 
-This folder contains the system-level design documentation for the body ECU effort.
+System-level design documentation for Open SDV Bench, following the systems-engineering flow: requirements → architecture → decisions.
 
-## Contents
-
-- `requirements/` — requirement statements for body-zone behavior.
-- `arc42/` — architecture documentation.
-- `adr/` — architecture decision records.
-- `diagrams/` — diagrams used to communicate system structure.
+| Folder / file | Contents |
+|---|---|
+| `requirements/` | System requirements with IDs `REQ-<AREA>-<NNN>` |
+| `architecture/` | arc42 overview + views: `logical/`, `software/`, `network/`, `deployment/` |
+| `adr/` | Architecture Decision Records |
+| `hardware/` | Bench inventory (`bom.md`) and wiring diagrams (`wiring/`) |
+| `spec-inputs/` | Reviewed inputs for the Spec Kit commands |
+| `devlog.md` | Dated progress log |

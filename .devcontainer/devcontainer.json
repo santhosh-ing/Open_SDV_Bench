@@ -1,0 +1,19 @@
+{
+  "name": "Open SDV Bench",
+  "build": { "dockerfile": "Dockerfile" },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "jebbs.plantuml",
+        "hediet.vscode-drawio",
+        "bierner.markdown-mermaid",
+        "asciidoctor.asciidoctor-vscode",
+        "redhat.vscode-yaml",
+        "ms-vscode.cmake-tools"
+      ]
+    }
+  },
+  "postCreateCommand": "python3 -m cantools dump interfaces/can/body.dbc > /dev/null && echo 'Dev container ready: DBC contract OK'",
+  "remoteUser": "vscode"
+}

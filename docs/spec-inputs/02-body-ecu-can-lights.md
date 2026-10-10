@@ -6,7 +6,7 @@ Prerequisite: Spec 001 done and verified on the board.
 
 ---
 
-## Part A — paste after `/speckit.specify`
+## Part A — paste after `/speckit-specify`
 
 Body zone ECU light control over CAN for open-sdv-bench, implementing the CAN contract `interfaces/can/body.dbc` version 0.1 (messages BODY_LightCmd 0x200 and BODY_LightStatus 0x210).
 
@@ -46,14 +46,14 @@ Body zone ECU light control over CAN for open-sdv-bench, implementing the CAN co
 - In "Silence", after ~0.5 s: indicators off, orange (low beam) on, blue blinks fast. Next press ("Off") → blue back to 1 Hz.
 - In the debugger, the received-frame counter increases by ~10 per second, the alive-counter error count stays 0, and the last transmitted status frame matches the LED states.
 
-**Open questions for `/speckit.clarify`:**
+**Open questions for `/speckit-clarify`:**
 - Is "low beam ON" the right fail-safe, or should lamps keep their last commanded state?
 - Should the first indicator on-phase start immediately on request (as in real cars) or wait for the next blink cycle?
 - FR-005 behaviour for the invalid left+right combination.
 
 ---
 
-## Part B — paste after `/speckit.plan`
+## Part B — paste after `/speckit-plan`
 
 Technical context for the plan:
 

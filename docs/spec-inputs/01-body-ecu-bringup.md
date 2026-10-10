@@ -2,12 +2,12 @@
 
 Goal of this feature: prove the toolchain and the firmware skeleton (layers, scheduler, BSP) on the real board — before any CAN.
 
-Spec Kit separates **what/why** (`/speckit.specify`) from **how** (`/speckit.plan`).
+Spec Kit separates **what/why** (`/speckit-specify`) from **how** (`/speckit-plan`).
 That's why this file has two parts. Don't paste the technical part into `specify`.
 
 ---
 
-## Part A — paste after `/speckit.specify`
+## Part A — paste after `/speckit-specify`
 
 Body zone ECU bring-up for the open-sdv-bench body ECU (STM32F407G-DISC1 board).
 
@@ -41,7 +41,7 @@ Body zone ECU bring-up for the open-sdv-bench body ECU (STM32F407G-DISC1 board).
 
 ---
 
-## Part B — paste after `/speckit.plan`
+## Part B — paste after `/speckit-plan`
 
 Technical context for the plan:
 
