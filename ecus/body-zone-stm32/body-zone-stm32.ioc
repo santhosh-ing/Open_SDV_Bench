@@ -1,0 +1,23 @@
+# STM32CubeMX project placeholder
+# This file represents the hardware configuration source for the body-zone MCU.
+
+ProjectName = body-zone-stm32
+MCU = STM32G0B1RET6
+
+Pins:
+  PA5  -> GPIO_Output  (LED_GREEN)
+  PA6  -> GPIO_Output  (LED_YELLOW)
+  PB10 -> GPIO_Output  (LEFT_TURN)
+  PB11 -> GPIO_Output  (RIGHT_TURN)
+  PA8  -> TIM1_CH1     (MIRROR_SERVO)
+  PB7  -> CAN1_RX      (CAN_RX)
+  PB8  -> CAN1_TX      (CAN_TX)
+
+Peripherals:
+  CAN1: Enabled
+  TIM1: Enabled
+  GPIO: Enabled
+
+Notes:
+  - Generated code belongs under Core/ and Drivers/.
+  - Application logic belongs under app/.

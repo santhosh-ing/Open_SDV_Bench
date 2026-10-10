@@ -1,0 +1,38 @@
+VERSION "1.0"
+
+NS_ :
+    NS_DESC_
+    CM_
+    BA_DEF_
+    BA_
+    VAL_
+    CAT_DEF_
+    CAT_
+    FILTER
+    BA_DEF_DEF_
+    EV_DATA_
+    ENVVAR_DATA_
+    SGTYPE_
+    SGTYPE_VAL_
+    BA_DEF_SGTYPE_
+    BA_SGTYPE_
+    SIG_VALTYPE_
+    VAL_TABLE_
+
+BS_:
+
+BU_: BODY_ECU
+
+BO_ 1 BODY_STATUS: 8 BODY_ECU
+ SG_ 1 HAZARD_REQ : 0|8@1+ (1,0) [0|1] "bool" Vector__XXX
+ SG_ 2 INDICATOR_STATE : 8|8@1+ (1,0) [0|3] "enum" Vector__XXX
+ SG_ 3 MIRROR_HEAT_REQ : 16|8@1+ (1,0) [0|1] "bool" Vector__XXX
+ SG_ 4 CHECKSUM : 24|8@1+ (1,0) [0|255] "uint8" Vector__XXX
+
+BO_ 2 BODY_LIGHTS_STATUS: 8 BODY_ECU
+ SG_ 5 LEFT_TURN_ACTIVE : 0|8@1+ (1,0) [0|1] "bool" Vector__XXX
+ SG_ 6 RIGHT_TURN_ACTIVE : 8|8@1+ (1,0) [0|1] "bool" Vector__XXX
+ SG_ 7 HAZARD_ACTIVE : 16|8@1+ (1,0) [0|1] "bool" Vector__XXX
+ SG_ 8 CHECKSUM : 24|8@1+ (1,0) [0|255] "uint8" Vector__XXX
+
+VAL_ 2 INDICATOR_STATE 0 "OFF" 1 "LEFT" 2 "RIGHT" 3 "HAZARD" ;

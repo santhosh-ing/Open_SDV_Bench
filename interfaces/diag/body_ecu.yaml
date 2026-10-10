@@ -1,0 +1,27 @@
+ecu:
+  name: body-zone-stm32
+  protocol: uds
+  version: 0.1.0
+
+services:
+  - id: 0x10
+    name: DiagnosticSessionControl
+    description: Switch between default and extended diagnostic sessions.
+
+  - id: 0x19
+    name: ReadDTCInformation
+    description: Return active faults and warnings for body output channels.
+
+  - id: 0x22
+    name: ReadDataByIdentifier
+    description: Return status of hazard, indicator, and mirror channels.
+
+  - id: 0x2E
+    name: WriteDataByIdentifier
+    description: Set configuration values for body output behavior.
+
+signals:
+  hazard_state: { type: bool, default: false }
+  left_indicator_state: { type: bool, default: false }
+  right_indicator_state: { type: bool, default: false }
+  mirror_heat_state: { type: bool, default: false }

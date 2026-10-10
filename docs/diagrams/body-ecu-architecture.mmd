@@ -1,0 +1,8 @@
+graph TD
+    A[Vehicle Network] --> B[CAN Interface]
+    B --> C[COM Layer]
+    C --> D[Functions Layer]
+    D --> E[BSP Layer]
+    C --> F[Diagnostic Layer]
+    E --> G[GPIO / PWM / Timers]
+    F --> H[UDS / Diagnostics]
