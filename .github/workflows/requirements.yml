@@ -1,0 +1,79 @@
+name: requirements
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history for the suspect-link review
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install StrictDoc
+        run: pip install strictdoc==0.30.2
+
+      - name: Validate and export requirements (syntax, unique IDs, links)
+        run: >
+          strictdoc export docs/requirements
+          --project-title "Open SDV Bench requirements"
+          --formats html,reqif-sdoc
+          --output-dir build/req
+
+      - name: Check requirement rules and build traceability matrix
+        run: >
+          python3 tools/req_check.py
+          --report-html build/req/html/traceability.html
+          --report-md build/req/traceability.md
+
+      - name: Suspect-link review (children of changed requirements)
+        if: github.event_name == 'pull_request'
+        run: python3 tools/req_check.py --impact "origin/${{ github.base_ref }}"
+
+      - name: Add traceability matrix to the job summary
+        run: cat build/req/traceability.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Assemble report site
+        run: |
+          mkdir -p build/site
+          cp -r build/req/html/. build/site/
+          mkdir -p build/site/reqif
+          cp build/req/reqif/output.reqif build/site/reqif/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: requirements-report
+          path: build/site
+
+      - name: Prepare GitHub Pages upload
+        if: github.event_name == 'push' && vars.REQ_REPORT_PAGES == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/site
+
+  publish:
+    # Publishes the report to GitHub Pages. Enable once:
+    #   Settings → Pages → Source: GitHub Actions, then
+    #   Settings → Secrets and variables → Actions → Variables: REQ_REPORT_PAGES = true
+    if: github.event_name == 'push' && vars.REQ_REPORT_PAGES == 'true'
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
