@@ -16,6 +16,7 @@ The maintainer is a systems architect, not a professional programmer. Explain no
 | `docs/architecture/` | arc42 + views: `logical/`, `software/`, `network/`, `deployment/` | Diagrams as code (Mermaid, PlantUML, draw.io) |
 | `docs/adr/` | Architecture Decision Records `NNNN-title.md` | One decision per file |
 | `docs/hardware/` | `bom.md`, `wiring/` (WireViz) | Keep in sync with the bench |
+| `docs/guides/` | How-to guides (firmware workflow, build and flash) | Written for non-embedded readers; update when tools or commands change |
 | `docs/spec-inputs/` | Reviewed input texts for Spec Kit commands | Source of each spec |
 | `docs/devlog.md` | Short dated progress log | Append, never rewrite |
 | `interfaces/` | **Contracts**: `can/*.dbc`, `vss/`, `diag/*.yaml` | See "Contracts first" |

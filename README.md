@@ -72,7 +72,7 @@ Progress is logged in the [devlog](docs/devlog.md).
 
 | Path | Contents |
 |---|---|
-| `docs/` | Requirements, architecture views, ADRs, hardware, Spec Kit inputs, devlog |
+| `docs/` | Requirements, architecture views, ADRs, hardware, guides, Spec Kit inputs, devlog |
 | `interfaces/` | Contracts: CAN (DBC), VSS, diagnostics |
 | `specs/` | Spec Kit feature specifications |
 | `ecus/` | Firmware: body zone (STM32), sensor zone (Arduino), virtual twins |
@@ -93,6 +93,8 @@ python3 -m cantools dump interfaces/can/body.dbc
 
 Or open the repo in VS Code and choose **Reopen in Container**; all tools come preinstalled.
 Firmware flashing (STM32Cube for VS Code, ST-LINK over USB) runs on your host, not in the container.
+
+New to embedded? [From code to blinking LED](docs/guides/firmware-workflow.md) explains what building and flashing firmware actually does. The commands are in [STM32 setup, build and flash](docs/guides/stm32-build-and-flash.md).
 
 ## How this project is built
 

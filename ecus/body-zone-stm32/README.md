@@ -18,6 +18,18 @@ Lights (hazard, indicators, low beam), mirror servo (later) and UDS diagnostics 
 5. In `main.c`, inside `USER CODE` blocks only: call `app_init()` before the main loop and `app_run()` inside it.
 6. Flash a plain blink first to prove the toolchain.
 
+## Build and flash
+
+From this folder, with the board connected over USB:
+
+```powershell
+cube-cmake --preset Debug                 # configure (first time, or after adding files)
+cube-cmake --build --preset Debug         # build → build/Debug/body-zone-stm32.elf
+cube programmer -c port=SWD -w build/Debug/body-zone-stm32.elf -v -rst   # flash, verify, reset
+```
+
+Tool setup and troubleshooting: [STM32 setup, build and flash](../../docs/guides/stm32-build-and-flash.md). What each step does: [From code to blinking LED](../../docs/guides/firmware-workflow.md).
+
 ## Regenerate CAN code from the contract
 
 ```bash
