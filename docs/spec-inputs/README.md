@@ -7,6 +7,7 @@ Reviewed input texts for the Spec Kit commands. They are kept in the repo as the
 | `00-constitution-input.md` | `/speckit-constitution` |
 | `01-body-ecu-bringup.md` | Part A → `/speckit-specify`, Part B → `/speckit-plan` |
 | `02-body-ecu-can-lights.md` | Part A → `/speckit-specify`, Part B → `/speckit-plan` |
+| `03-project-website.md` | Part A → `/speckit-specify`, Part B → `/speckit-plan` (project infrastructure, can run in parallel with M1) |
 
 ## Order of work
 
