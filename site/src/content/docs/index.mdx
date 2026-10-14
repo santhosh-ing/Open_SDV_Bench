@@ -1,0 +1,56 @@
+---
+title: Open SDV Bench
+description: A software-defined vehicle on your desk — Eclipse SDV stack, zone controllers on CAN and Ethernet, central HPC, ADAS and cloud, engineered from requirements to blinking LED.
+template: splash
+editUrl: false
+hero:
+  tagline: A software-defined vehicle on your desk, built from hobby hardware and the Eclipse SDV stack, and engineered the way real automotive systems are — requirements → architecture → decisions → code → test.
+  actions:
+    - text: Get started
+      link: /Open_SDV_Bench/hardware/bom/
+      icon: right-arrow
+    - text: Architecture
+      link: /Open_SDV_Bench/architecture/
+      variant: secondary
+    - text: GitHub
+      link: https://github.com/santhosh-ing/Open_SDV_Bench
+      icon: github
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import Topology from '../../components/Topology.astro';
+import MilestoneTable from '../../components/MilestoneTable.astro';
+
+## The bench
+
+A central vehicle computer and two zone controllers, an ADAS domain and a cloud tier — one small but realistic E/E architecture that mixes CAN and Ethernet.
+
+<Topology />
+
+## Why it is built this way
+
+<CardGrid>
+  <Card title="Architecture first" icon="puzzle">
+    Logical, software, network and deployment views, and one decision record per choice — before the code that implements them.
+  </Card>
+  <Card title="Every function is traced" icon="list-format">
+    Stakeholder need → system → function → component requirement → firmware → test, checked in CI on every change.
+  </Card>
+  <Card title="Real hardware, real buses" icon="setting">
+    STM32 on CAN, Arduino and Jetson on Ethernet, Eclipse Kuksa, OpenSOVD and Ankaios on a Raspberry Pi 5 — with a virtual twin for each ECU.
+  </Card>
+</CardGrid>
+
+## Roadmap
+
+<MilestoneTable />
+
+## Explore
+
+<CardGrid>
+  <LinkCard title="Requirements report" description="All requirements, the traceability matrix and a ReqIF export, rebuilt on every change." href="/Open_SDV_Bench/requirements/" />
+  <LinkCard title="Decision records" description="Why the bench is layered, wired and managed the way it is." href="/Open_SDV_Bench/adr/" />
+  <LinkCard title="From code to blinking LED" description="What building and flashing firmware actually does — for non-embedded readers." href="/Open_SDV_Bench/guides/firmware-workflow/" />
+  <LinkCard title="Devlog" description="Short, dated progress notes, newest first." href="/Open_SDV_Bench/devlog/" />
+</CardGrid>

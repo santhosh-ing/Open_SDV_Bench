@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+# Generated from ../docs by scripts/sync-docs.mjs (index.mdx is hand-written)
+src/content/docs/*
+!src/content/docs/index.mdx
+# Generated in CI from docs/requirements by StrictDoc
+public/requirements/
+public/docs-assets/

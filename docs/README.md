@@ -11,3 +11,5 @@ System-level design documentation for Open SDV Bench, following the systems-engi
 | `guides/` | How-to guides: firmware workflow explained, STM32 setup, build and flash |
 | `spec-inputs/` | Reviewed inputs for the Spec Kit commands |
 | `devlog.md` | Dated progress log |
+
+Published as the project website: <https://santhosh-ing.github.io/Open_SDV_Bench/> (built from this folder by `site/`, spec 003).

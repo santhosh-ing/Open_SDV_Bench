@@ -1,0 +1,20 @@
+{
+  "name": "open-sdv-bench-site",
+  "private": true,
+  "type": "module",
+  "description": "Project website for Open SDV Bench (spec 003). Content comes from ../docs.",
+  "scripts": {
+    "sync": "node scripts/sync-docs.mjs",
+    "dev": "npm run sync && astro dev",
+    "build": "npm run sync && astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.42.6",
+    "astro": "^7.3.8",
+    "astro-mermaid": "^2.1.0",
+    "js-yaml": "^4.3.2",
+    "mermaid": "^11.17.2",
+    "starlight-links-validator": "^0.27.0"
+  }
+}

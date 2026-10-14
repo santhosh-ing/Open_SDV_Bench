@@ -4,6 +4,8 @@
 
 Open SDV Bench connects a cloud backend, a central vehicle computer, an ADAS domain and two zone controllers into one small but realistic vehicle E/E architecture. It mixes CAN and Ethernet, runs open-source Eclipse SDV components, and every function can be traced from a requirement down to a blinking LED on the bench.
 
+**Website:** <https://santhosh-ing.github.io/Open_SDV_Bench/> — architecture, requirements report, roadmap and devlog in one place.
+
 > Status: **M0 – Foundation** (architecture and contracts before code). Next up: **M1**, bringing up the STM32 zone controller.
 
 ![Open SDV Bench network and deployment view](docs/architecture/network/network-topology.drawio.svg)
@@ -79,6 +81,7 @@ Progress is logged in the [devlog](docs/devlog.md).
 | `hpc/`, `adas-jetson/`, `deploy/` | Central computer, ADAS domain, deployment (later milestones) |
 | `tests/` | System and integration tests |
 | `tools/` | Helper scripts (e.g. CAN code generation) |
+| `site/` | Project website (Astro + Starlight), generated from `docs/`; see [spec 003](specs/003-project-website/quickstart.md) |
 
 ## Quickstart
 

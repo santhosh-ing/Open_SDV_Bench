@@ -1,0 +1,20 @@
+/* custom.css — spec 003: accent colours, topology colours, narrow-screen safety (FR-014) */
+:root {
+  --sl-color-accent-low: #0d2c2c;
+  --sl-color-accent: #14b8a6;
+  --sl-color-accent-high: #99f6e4;
+  --topo-can: #f59e0b;
+  --topo-eth: #38bdf8;
+  --topo-ip: #a78bfa;
+}
+:root[data-theme='light'] {
+  --sl-color-accent-low: #ccfbf1;
+  --sl-color-accent: #0f766e;
+  --sl-color-accent-high: #134e4a;
+  --topo-can: #b45309;
+  --topo-eth: #0369a1;
+  --topo-ip: #6d28d9;
+}
+/* Wide Markdown tables scroll inside themselves instead of widening the page. */
+.sl-markdown-content table { display: block; overflow-x: auto; max-width: 100%; }
+.sl-markdown-content pre { max-width: 100%; }

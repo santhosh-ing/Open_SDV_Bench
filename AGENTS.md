@@ -29,6 +29,7 @@ The maintainer is a systems architect, not a professional programmer. Explain no
 | `deploy/` | docker compose, later Eclipse Ankaios manifests | |
 | `tests/` | System / integration tests | Tagged with REQ IDs |
 | `tools/` | Helper scripts, e.g. `gen_can.sh` | |
+| `site/` | Project website (Astro + Starlight), pages generated from `docs/` by `site/scripts/sync-docs.mjs` | Edit content in `docs/`, never in `site/src/content/docs/` (generated). Relative links in `docs/` must resolve, or the site build fails |
 
 ## Rules
 
