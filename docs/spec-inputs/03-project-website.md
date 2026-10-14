@@ -8,7 +8,7 @@ Prerequisite: none. This is project infrastructure and can run in parallel with 
 
 ## Part A — paste after `/speckit-specify`
 
-Project website for open-sdv-bench, published on GitHub Pages at `https://santhosh-ing.github.io/open_sdv_bench/`, built from the repository on every push to `main`.
+Project website for open-sdv-bench, published on GitHub Pages at `https://santhosh-ing.github.io/Open_SDV_Bench/`, built from the repository on every push to `main`.
 
 **Why:** The bench is a portfolio project. A visitor (recruiter, hiring manager, fellow engineer) should understand within a few seconds what the bench is and why it is built the way it is, then be able to dig into architecture, requirements and progress. The GitHub README alone does not do that well: it cannot show diagrams interactively, group guides and views, or tell the story milestone by milestone. The requirements report (StrictDoc HTML, traceability matrix, ReqIF) is already built by CI and should be part of the same site instead of a separate one.
 
@@ -26,7 +26,7 @@ Project website for open-sdv-bench, published on GitHub Pages at `https://santho
 
 - FR-001: The website shall be built with Astro and the Starlight documentation theme.
 - FR-002: The website source (configuration, landing page, components) shall live in `site/`. Content that already exists in `docs/` shall be used from there, not copied.
-- FR-003: The website shall be published on GitHub Pages at `https://santhosh-ing.github.io/open_sdv_bench/`.
+- FR-003: The website shall be published on GitHub Pages at `https://santhosh-ing.github.io/Open_SDV_Bench/`.
 - FR-004: A GitHub Actions workflow shall build and deploy the website on every push to `main` that changes `site/`, `docs/` or `README.md`.
 - FR-005: The website build shall run on every pull request and fail if the build fails or an internal link is broken.
 - FR-006: The landing page shall show the project name, a one-sentence pitch and links to "Get started", "Architecture" and the GitHub repository.
@@ -67,7 +67,7 @@ Project website for open-sdv-bench, published on GitHub Pages at `https://santho
 Technical context for the plan:
 
 - **Stack:** Astro + `@astrojs/starlight`, Node LTS, `npm ci`. Mermaid via a Starlight/Astro Mermaid integration (e.g. `astro-mermaid`). Link check with `starlight-links-validator`.
-- **Paths:** `site/astro.config.mjs` with `site: 'https://santhosh-ing.github.io'` and `base: '/open_sdv_bench'`. Landing page `site/src/content/docs/index.mdx` with `template: splash`.
+- **Paths:** `site/astro.config.mjs` with `site: 'https://santhosh-ing.github.io'` and `base: '/Open_SDV_Bench'`. Landing page `site/src/content/docs/index.mdx` with `template: splash`.
 - **Reusing `docs/`:** prefer pointing Starlight's content collection at `docs/` (Astro content loader with a glob over `../docs`) over copying files. If frontmatter is required, add it to the existing Markdown files rather than duplicating them. Keep relative links between docs working on GitHub too.
 - **Milestones:** `site/src/data/milestones.yaml` (id, title, scope, status), rendered by `site/src/components/MilestoneTable.astro`.
 - **Requirements report:** in the website workflow, install `strictdoc==0.30.2`, run the same export and `tools/req_check.py --report-html` as `requirements.yml`, and copy `build/req/html/` plus `build/req/reqif/output.reqif` into `site/public/requirements/` before `npm run build`. `site/public/requirements/` is gitignored.
