@@ -6,6 +6,8 @@ Short, dated entries: what was done, what was learned, what's next. Newest at th
 
 - Spec input for a public project website (spec 003): Astro + Starlight on GitHub Pages, landing page modelled on rea.tools, built from the existing `docs/` and including the requirements report. Skeleton in M0, feature showcases after M2.
 - **Next:** decide the Pages ownership question (website vs. requirements report), then `/speckit-specify` with `docs/spec-inputs/03-project-website.md`.
+- Project website built (spec 003): Astro + Starlight in `site/`, generated from `docs/` at build time, landing page with topology and roadmap, requirements report under `/requirements/`. `site.yml` now owns GitHub Pages; `requirements.yml` only validates.
+- **Next:** enable Pages (Settings → Pages → Source: GitHub Actions) and check the live site; then back to `/speckit-constitution` and spec 001.
 
 ## 2026-10-11
 

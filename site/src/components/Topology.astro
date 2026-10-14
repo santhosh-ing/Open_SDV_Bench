@@ -1,0 +1,90 @@
+---
+// Topology.astro — spec 003, FR-007: bench network topology (ADR 0003) as inline SVG.
+// Central HPC star: IP to the cloud, Ethernet to ADAS and the sensor zone, CAN to the body zone.
+// Two layouts: a wide star for desktop, a stacked one for phones (FR-014) so labels stay readable.
+type Node = { id: string; title: string; sub: string; hub?: boolean };
+type Pos = Record<string, [number, number]>;
+type LabelPos = Record<string, [number, number, 'start' | 'middle' | 'end']>;
+
+const nodes: Node[] = [
+  { id: 'cloud', title: 'OpenSDV.Cloud', sub: 'OTA · remote diagnostics' },
+  { id: 'adas', title: 'ADAS domain', sub: 'Jetson Orin' },
+  { id: 'hpc', title: 'Central HPC', sub: 'Raspberry Pi 5', hub: true },
+  { id: 'zca', title: 'ZC-Arduino', sub: 'Sensor zone' },
+  { id: 'zcs', title: 'ZC-STM32', sub: 'Body zone · lights · UDS' },
+];
+const links = [
+  { to: 'cloud', label: 'IP · MQTT / HTTPS', kind: 'ip' },
+  { to: 'adas', label: 'Ethernet', kind: 'eth' },
+  { to: 'zca', label: 'Ethernet', kind: 'eth' },
+  { to: 'zcs', label: 'CAN 500 kbit/s', kind: 'can' },
+];
+
+const layouts = [
+  {
+    cls: 'wide', w: 640, h: 400, box: [160, 58],
+    pos: { cloud: [320, 50], adas: [90, 200], hpc: [320, 200], zca: [550, 200], zcs: [320, 350] } as Pos,
+    label: { cloud: [330, 129, 'start'], adas: [205, 192, 'middle'], zca: [435, 192, 'middle'], zcs: [330, 279, 'start'] } as LabelPos,
+  },
+  {
+    cls: 'narrow', w: 360, h: 520, box: [150, 58],
+    pos: { cloud: [180, 40], hpc: [180, 180], adas: [90, 330], zca: [270, 330], zcs: [180, 470] } as Pos,
+    label: { cloud: [190, 114, 'start'], adas: [120, 250, 'end'], zca: [240, 250, 'start'], zcs: [190, 410, 'start'] } as LabelPos,
+  },
+];
+---
+<figure class="topology not-content">
+  {layouts.map((L) => (
+    <svg class={`topo topo--${L.cls}`} viewBox={`0 0 ${L.w} ${L.h}`} role="img" aria-label="Open SDV Bench network topology: a central HPC (Raspberry Pi 5) connects over IP to OpenSDV.Cloud, over Ethernet to the Jetson Orin ADAS domain and the Arduino sensor zone controller, and over CAN to the STM32 body zone controller.">
+      {links.map((l) => {
+        const [x1, y1] = L.pos.hpc, [x2, y2] = L.pos[l.to], [lx, ly, anchor] = L.label[l.to];
+        return (
+          <g class={`link link--${l.kind}`}>
+            <line x1={x1} y1={y1} x2={x2} y2={y2} />
+            <text x={lx} y={ly} text-anchor={anchor}>{l.label}</text>
+          </g>
+        );
+      })}
+      {nodes.map((n) => {
+        const [x, y] = L.pos[n.id], [bw, bh] = L.box;
+        return (
+          <g class={`node ${n.hub ? 'node--hub' : ''}`}>
+            <rect x={x - bw / 2} y={y - bh / 2} width={bw} height={bh} rx="10" />
+            <text class="node__title" x={x} y={y - 4} text-anchor="middle">{n.title}</text>
+            <text class="node__sub" x={x} y={y + 15} text-anchor="middle">{n.sub}</text>
+          </g>
+        );
+      })}
+    </svg>
+  ))}
+  <figcaption>
+    <span class="key key--can">CAN</span> deterministic signals ·
+    <span class="key key--eth">Ethernet</span> services and bulk data ·
+    <span class="key key--ip">IP</span> cloud · Decision: <a href={`${import.meta.env.BASE_URL}adr/0003-bench-network-topology/`}>ADR 0003</a>
+  </figcaption>
+</figure>
+
+<style>
+  .topology { margin: 1.5rem 0; }
+  .topo { width: 100%; height: auto; font-family: var(--sl-font); }
+  .topo--wide { display: block; max-width: 48rem; margin-inline: auto; }
+  .topo--narrow { display: none; }
+  @media (max-width: 40rem) {
+    .topo--wide { display: none; }
+    .topo--narrow { display: block; }
+  }
+  .link line { stroke-width: 3; }
+  .link text { font-size: 13px; fill: var(--sl-color-gray-2); }
+  .link--can line { stroke: var(--topo-can); }
+  .link--eth line { stroke: var(--topo-eth); }
+  .link--ip line { stroke: var(--topo-ip); stroke-dasharray: 7 6; }
+  .node rect { fill: var(--sl-color-bg-nav); stroke: var(--sl-color-gray-4); stroke-width: 1.5; }
+  .node--hub rect { stroke: var(--sl-color-accent); stroke-width: 2.5; }
+  .node__title { font-size: 15px; font-weight: 700; fill: var(--sl-color-white); }
+  .node__sub { font-size: 12px; fill: var(--sl-color-gray-3); }
+  figcaption { font-size: var(--sl-text-sm); color: var(--sl-color-gray-3); text-align: center; margin-top: 0.5rem; }
+  .key { font-weight: 600; }
+  .key--can { color: var(--topo-can); }
+  .key--eth { color: var(--topo-eth); }
+  .key--ip { color: var(--topo-ip); }
+</style>

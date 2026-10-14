@@ -55,25 +55,5 @@ jobs:
           name: requirements-report
           path: build/site
 
-      - name: Prepare GitHub Pages upload
-        if: github.event_name == 'push' && vars.REQ_REPORT_PAGES == 'true'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: build/site
-
-  publish:
-    # Publishes the report to GitHub Pages. Enable once:
-    #   Settings → Pages → Source: GitHub Actions, then
-    #   Settings → Secrets and variables → Actions → Variables: REQ_REPORT_PAGES = true
-    if: github.event_name == 'push' && vars.REQ_REPORT_PAGES == 'true'
-    needs: check
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
-    steps:
-      - id: deploy
-        uses: actions/deploy-pages@v4
+  # Publishing to GitHub Pages moved to site.yml (spec 003): the website includes this
+  # report under /requirements/. This workflow keeps validating and uploads the artifact.

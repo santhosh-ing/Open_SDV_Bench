@@ -1,0 +1,84 @@
+# site.yml — spec 003 (project website).
+# Pull requests: build the website (fails on build errors or broken internal links).
+# Push to main: build and publish to GitHub Pages, including the requirements report under /requirements/.
+# This is the only workflow that deploys to Pages. One-time setting: Settings → Pages → Source: GitHub Actions.
+name: site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "docs/**"
+      - "README.md"
+      - "tools/req_check.py"
+      - ".github/workflows/site.yml"
+  pull_request:
+    paths:
+      - "site/**"
+      - "docs/**"
+      - "README.md"
+      - "tools/req_check.py"
+      - ".github/workflows/site.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build requirements report
+        run: |
+          pip install strictdoc==0.30.2
+          strictdoc export docs/requirements \
+            --project-title "Open SDV Bench requirements" \
+            --formats html,reqif-sdoc \
+            --output-dir build/req
+          python3 tools/req_check.py --report-html build/req/html/traceability.html
+          mkdir -p site/public/requirements/reqif
+          cp -r build/req/html/. site/public/requirements/
+          cp build/req/reqif/output.reqif site/public/requirements/reqif/
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Build website (syncs docs/, validates links)
+        working-directory: site
+        run: |
+          npm ci
+          npm run build
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

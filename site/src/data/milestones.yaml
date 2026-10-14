@@ -1,0 +1,39 @@
+# Milestone status shown on the website landing page (spec 003, FR-008).
+# Keep in sync with the README roadmap. Status: done | in-progress | planned
+- id: M0
+  title: Foundation
+  scope: Requirements, architecture, contracts, repo and tooling
+  status: in-progress
+- id: M1
+  title: Body zone controller on the bench
+  scope: STM32 bring-up and light control over CAN (loopback)
+  status: planned
+- id: M2
+  title: Walking skeleton
+  scope: VSS signal → Kuksa → CAN → STM32, end to end
+  status: planned
+- id: M3
+  title: Classic diagnostics
+  scope: UDS server on the STM32 zone controller
+  status: planned
+- id: M4
+  title: Service-oriented diagnostics
+  scope: Faults readable via Eclipse OpenSOVD REST
+  status: planned
+- id: M5
+  title: Vehicle function
+  scope: Emergency brake → hazard lights, with the Arduino sensor zone, traced to requirements
+  status: planned
+- id: M6
+  title: ADAS domain
+  scope: Jetson perception feeds the Databroker over Ethernet
+  status: planned
+- id: M7
+  title: Orchestration
+  scope: Eclipse Ankaios manages vehicle functions
+  status: planned
+- id: M8
+  title: Cloud and OTA
+  scope: "OpenSDV.Cloud: over-the-air app updates and remote SOVD access"
+  status: planned
+  proposed: true

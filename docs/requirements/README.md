@@ -96,4 +96,4 @@ strictdoc server docs/requirements
 
 ## Published report
 
-CI builds the StrictDoc HTML export, the traceability matrix (`traceability.html`) and a ReqIF file on every run, available as the `requirements-report` artifact. On `main` it is published to GitHub Pages once Pages is enabled (see `.github/workflows/requirements.yml`).
+CI builds the StrictDoc HTML export, the traceability matrix (`traceability.html`) and a ReqIF file on every run, available as the `requirements-report` artifact. On `main` the project website publishes the same report at [/requirements/](https://santhosh-ing.github.io/Open_SDV_Bench/requirements/) (`.github/workflows/site.yml`, spec 003).
