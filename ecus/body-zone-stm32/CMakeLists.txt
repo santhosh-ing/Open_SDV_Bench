@@ -45,11 +45,23 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
+    # Project code (app/), layered: functions -> bsp -> HAL (AGENTS.md)
+    app/app.c
+    app/sched/sched.c
+    app/functions/ecu_state.c
+    app/bsp/bsp_led.c
+    app/bsp/bsp_button.c
+    app/bsp/bsp_tick.c
+    app/bsp/debounce.c
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
+    app
+    app/sched
+    app/functions
+    app/bsp
 )
 
 # Add project symbols (macros)
