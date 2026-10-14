@@ -2,6 +2,11 @@
 
 Short, dated entries: what was done, what was learned, what's next. Newest at the top.
 
+## 2026-10-14
+
+- Spec input for a public project website (spec 003): Astro + Starlight on GitHub Pages, landing page modelled on rea.tools, built from the existing `docs/` and including the requirements report. Skeleton in M0, feature showcases after M2.
+- **Next:** decide the Pages ownership question (website vs. requirements report), then `/speckit-specify` with `docs/spec-inputs/03-project-website.md`.
+
 ## 2026-10-11
 
 - Body zone firmware builds and flashes from VS Code: the missing ARM compiler bundle (`gnu-tools-for-stm32` 14.3.1) was installed, a blink test build used 6 116 B flash and 1 584 B RAM, and STM32CubeProgrammer wrote and verified it over ST-LINK.
