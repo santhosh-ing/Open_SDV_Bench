@@ -2,6 +2,13 @@
 
 Short, dated entries: what was done, what was learned, what's next. Newest at the top.
 
+## 2026-10-14 (late)
+
+- Constitution ratified (v1.0.0) from the reviewed input.
+- Spec 001 body ECU bring-up implemented: 1 ms cooperative scheduler with 1/10/100 ms slots, board support for LEDs, button and time base, ECU states Init/Normal with a 1 s lamp test, 1 Hz heartbeat and a debounced button demo. Only on-board LEDs and button, no wiring.
+- 16 host unit tests (Unity) for debounce, scheduler timing and lamp test/heartbeat; new `firmware` CI job runs them and builds the target firmware (7.5 KB flash, 1.6 KB RAM).
+- **Next:** flash and observe on the board (`specs/001-body-ecu-bringup/quickstart.md`); then spec 002 (CAN light control, loopback first) while the transceiver order is on its way.
+
 ## 2026-10-14
 
 - Spec input for a public project website (spec 003): Astro + Starlight on GitHub Pages, landing page modelled on rea.tools, built from the existing `docs/` and including the requirements report. Skeleton in M0, feature showcases after M2.

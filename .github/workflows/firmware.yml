@@ -1,0 +1,46 @@
+# Body zone ECU firmware: host unit tests + target build (spec 001, SC-004/SC-005).
+name: firmware
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    paths: ["ecus/body-zone-stm32/**", ".github/workflows/firmware.yml"]
+  push:
+    branches: [main]
+    paths: ["ecus/body-zone-stm32/**", ".github/workflows/firmware.yml"]
+
+jobs:
+  host-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ecus/body-zone-stm32/tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build
+      - name: Build
+        run: cmake --build build
+      - name: Run tests
+        run: ctest --test-dir build --output-on-failure
+
+  target-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ecus/body-zone-stm32
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ARM toolchain
+        run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi ninja-build
+      - name: Build Debug firmware
+        run: |
+          cmake --preset Debug
+          cmake --build --preset Debug
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: body-zone-stm32-debug
+          path: ecus/body-zone-stm32/build/Debug/body-zone-stm32.elf
