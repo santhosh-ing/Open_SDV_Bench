@@ -59,3 +59,16 @@ TITLE: Evolve functions independently of hardware
 STATEMENT: >>>
 Engineers can change, test and update vehicle functions without being tied to a specific hardware unit, including running the whole vehicle without hardware.
 <<<
+
+[REQUIREMENT]
+UID: STK-006
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Demonstration
+TITLE: Operate the vehicle like with an ignition key
+STATEMENT: >>>
+The operator can switch the vehicle off, on and into an update mode, as with an ignition key, and sees the vehicle functions follow that state.
+<<<
+RATIONALE: >>>
+Vehicle functions behave differently depending on the vehicle state, and software updates need a safe state to be applied in (ADR 0006).
+<<<

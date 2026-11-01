@@ -26,15 +26,16 @@ Three allocations were considered:
 - ➖ The ZC-STM32 needs parameter storage and an update path (OTA demo, later SOVD → UDS).
 - The ZC-STM32 reports the indicator and hazard state to the HPC (Kuksa / VSS, dashboard).
 
-## Conflicts with the current baseline (to be resolved before acceptance)
+## Resolution of the conflicts and open points (2026-11-01)
 
-- **ADR 0002 / `interfaces/can/body.dbc` v0.1.0**: `IndLeftReq` and `IndRightReq` in `BODY_LightCmd` (HPC → ZC) would no longer be the source of indication. The contract needs a new version and its own ADR (rule 1 in `AGENTS.md`).
-- **SW-ZCS-010** (outputs follow the CAN requests) must be split or changed for the indicators.
-- **FUN-LIGHT-010** (comfort blink): the comment's open allocation question is answered here (ZC-STM32).
-- Is `HazardReq` still sent by the HPC, or does hazard also get a local input? See ADR 0006.
+| Item | Resolution |
+|---|---|
+| ADR 0002 / `body.dbc` v0.1.0 | `IndicatorLeftReq` / `IndicatorRightReq` are dropped from `BODY_LightCmd` in contract v0.2.0, proposed in ADR 0007. `HazardReq` stays as the central hazard request (FUN-LIGHT-012). |
+| SW-ZCS-010 | Changed: low beam and central hazard from CAN, direction only from the joystick. |
+| FUN-LIGHT-010 (comfort blink) | Allocated to the ZC-STM32; refined by SW-ZCS-050 and SW-ZCS-051. |
+| Joystick hardware | KY-023-type analogue joystick, X axis on PA1, push button on PE7, powered from 3V (HW-ZCS-001, `docs/hardware/wiring/joystick.yml`). |
+| Joystick interpretation | Thresholds with hysteresis and a 50 ms stability time (SW-ZCS-050). Tap = comfort blink, hold = indication while held (FUN-LIGHT-011, SW-ZCS-051). |
+| Hazard input | The joystick push button toggles the local hazard request (FUN-LIGHT-012, SW-ZCS-052). |
+| Lamps | On-board LEDs as in `AGENTS.md`: green = left, red = right. |
 
-## Open points
-
-- The joystick hardware (model, analogue or digital, pins on the STM32F407G-DISC1) is not in `docs/hardware/bom.md` yet.
-- Joystick interpretation: thresholds, debounce, neutral position, fault detection (stuck, out of range, open wire) and the resulting DTCs.
-- The lamp mapping stays as in `AGENTS.md` (green = left, red = right) unless decided otherwise.
+Still open: joystick fault detection (an open wire on the X axis cannot be told apart from a full deflection without extra hardware).
