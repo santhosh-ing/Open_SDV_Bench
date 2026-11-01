@@ -6,7 +6,8 @@ Reviewed input texts for the Spec Kit commands. They are kept in the repo as the
 |---|---|
 | `00-constitution-input.md` | `/speckit-constitution` |
 | `01-body-ecu-bringup.md` | Part A → `/speckit-specify`, Part B → `/speckit-plan` |
-| `02-body-ecu-can-lights.md` | Part A → `/speckit-specify`, Part B → `/speckit-plan` |
+| `02-body-ecu-can-lights.md` | Part A → `/speckit-specify`, Part B → `/speckit-plan`. **Describes contract v0.1; update to v0.2 (ADR 0007) before use** |
+| `04-body-ecu-joystick-indication.md` | Part A → `/speckit-specify`, Part B → `/speckit-plan` (joystick turn indication and hazard, local; runs **before** spec 002) |
 | `03-project-website.md` | Part A → `/speckit-specify`, Part B → `/speckit-plan` (project infrastructure, can run in parallel with M1) |
 
 ## Order of work
@@ -17,7 +18,7 @@ Reviewed input texts for the Spec Kit commands. They are kept in the repo as the
 3. `/speckit-constitution` + `00-constitution-input.md`, then check `.specify/memory/constitution.md`.
 4. Spec 001: generate the real CubeMX project (Board Selector → STM32F407G-DISC1, toolchain CMake) into `ecus/body-zone-stm32/`, flash a plain blink, then run
    `/speckit-specify` → `/speckit-clarify` → `/speckit-plan` → `/speckit-tasks` → `/speckit-implement`, and verify on the board.
-5. Spec 002: same flow.
+5. Spec 004 (joystick, local): same flow. Then spec 002 (CAN loopback, contract v0.2, vehicle state, fail-safe).
 
 ## Check the CAN contract
 
