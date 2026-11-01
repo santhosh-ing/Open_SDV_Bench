@@ -2,6 +2,13 @@
 
 Short, dated entries: what was done, what was learned, what's next. Newest at the top.
 
+## 2026-11-01
+
+- Started an Arcadia model in Capella 7.0.1 (one model; physical architecture first, then a logical architecture per node, linked to the hardware).
+- Proposed ADR 0005 (turn indication fully local in the ZC-STM32, joystick on the zone) and ADR 0006 (vehicle states Off/On/Update managed by the CGW role on the HPC, dashboard as input, fail-safe after 5 missed cycles, hazard per the production-vehicle concept).
+- Both conflict with ADR 0002 / `body.dbc` v0.1.0 and with FUN-SAFE-001, SW-ZCS-010 and SW-ZCS-021; requirements are unchanged until those are resolved.
+- **Next:** decide the hazard input in fail-safe, the vehicle state cycle time and the new fail-safe behaviour; then update the requirements and the contract (new ADR, DBC version bump).
+
 ## 2026-10-14 (late)
 
 - Constitution ratified (v1.0.0) from the reviewed input.
