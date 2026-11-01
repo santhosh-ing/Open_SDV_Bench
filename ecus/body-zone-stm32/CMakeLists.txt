@@ -51,6 +51,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     app/functions/ecu_state.c
     app/bsp/bsp_led.c
     app/bsp/bsp_button.c
+    app/bsp/bsp_joystick.c
     app/bsp/bsp_tick.c
     app/bsp/debounce.c
 )

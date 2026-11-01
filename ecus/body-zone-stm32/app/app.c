@@ -11,14 +11,22 @@
 #include <stddef.h>
 
 #include "bsp_button.h"
+#include "bsp_joystick.h"
 #include "bsp_tick.h"
 #include "ecu_state.h"
 #include "sched.h"
 
-/* 10 ms slot: read the button first, then let the ECU logic use the result. */
+/* Debugger-visible raw joystick readings (spec 004 bring-up step).
+ * Check in WATCH: X at rest, fully left, fully right; button pressed. */
+volatile uint16_t g_joy_raw_x = 0U;
+volatile bool g_joy_button_raw = false;
+
+/* 10 ms slot: read the inputs first, then let the ECU logic use the result. */
 static void task_ecu_10ms(void)
 {
     bsp_button_task_10ms();
+    g_joy_raw_x = bsp_joystick_read_x();
+    g_joy_button_raw = bsp_joystick_button_raw();
     ecu_state_task_10ms(bsp_button_pressed_event());
 }
 
@@ -38,6 +46,7 @@ static const sched_config_t sched_config = {
 void app_init(void)
 {
     bsp_button_init();
+    bsp_joystick_init();
     ecu_state_init();
     sched_init(&sched_config, bsp_tick_ms());
 }
