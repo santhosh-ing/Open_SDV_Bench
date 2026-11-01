@@ -19,6 +19,7 @@ Fill in exact models where marked `?` (M0 issue "Hardware inventory").
 | LEDs | ? | ? | External lamps (later) | have |
 | Servo motors | ? | ? | Mirror fold | have |
 | Jumper wires | ? | – | Bench wiring | have |
+| Joystick | KY-023-type 2-axis analogue module with push button | 1 | Turn-signal stalk (X axis) and hazard switch (push), ZC-STM32 (ADR 0005). Wiring: `wiring/joystick.yml` | have |
 
 ## To order (CAN bus and power)
 

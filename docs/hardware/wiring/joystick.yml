@@ -1,0 +1,28 @@
+# Joystick (turn-signal stalk) to the body zone controller.
+# Render: wireviz joystick.yml
+# Pins checked against the STM32F407G-DISC1 schematic (MB997): PA1, PA2 and PE7
+# are not used by on-board audio, motion sensor, USB or LEDs.
+
+connectors:
+  DISC1:
+    type: STM32F407G-DISC1 header
+    subtype: P1 / P2
+    pinlabels: [GND, 3V, PA1, PA2, PE7]
+    notes: PA1 = ADC1_IN1 (X axis), PA2 = ADC1_IN2 (reserved), PE7 = GPIO input with internal pull-up
+  JOY:
+    type: KY-023 analogue joystick module
+    pinlabels: [GND, +5V, VRx, VRy, SW]
+    notes: Power the module from 3V, never 5V - the axis outputs follow the supply and the ADC accepts at most 3.3 V.
+
+cables:
+  W1:
+    wirecount: 5
+    colors: [BK, RD, BU, VT, GN]
+    category: bundle
+    notes: Female-female jumper wires
+
+connections:
+  -
+    - DISC1: [1-5]
+    - W1: [1-5]
+    - JOY: [1-5]
