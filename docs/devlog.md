@@ -2,6 +2,14 @@
 
 Short, dated entries: what was done, what was learned, what's next. Newest at the top.
 
+## 2026-11-01 (evening)
+
+- Joystick wired on paper: KY-023 on PA1 (X axis), PE7 (push = hazard), powered from 3V (PR #10).
+- Requirements updated for ADR 0005/0006: tap = comfort blink, hold = indication while held, joystick push toggles local hazard, vehicle states Off / On / Update with a 500 ms fail-safe that keeps local indication working and switches the low beam on. New: STK-006, SYS-VEH-001, FUN-LIGHT-011, FUN-LIGHT-012, FUN-VEH-001, SW-ZCS-050…054, HW-ZCS-001; changed: FUN-SAFE-001, SW-ZCS-010, SW-ZCS-021.
+- Contract v0.2 proposed (ADR 0007: `VEH_State` 0x100, direction requests removed from `BODY_LightCmd`). Logical view added as Mermaid, mirroring the Capella LAB.
+- Working agreement: firmware is written by the maintainer in VS Code; AI assistants update requirements, ADRs and diagrams only, and code serves as reference.
+- **Next:** review and accept ADR 0005–0007; edit `body.dbc` to v0.2.0; update spec input 002; flash and verify spec 001.
+
 ## 2026-11-01
 
 - Started an Arcadia model in Capella 7.0.1 (one model; physical architecture first, then a logical architecture per node, linked to the hardware).

@@ -31,14 +31,16 @@ Zone functions, starting with the local turn indication (ADR 0005), must behave 
 - The CGW is a single point of failure for the vehicle state. This is accepted because the ZC-STM32 has a defined fail-safe.
 - The vehicle state needs a CAN signal from the HPC, which is a contract change (`body.dbc`, new version and ADR).
 
-## Conflicts with the current baseline (to be resolved before acceptance)
+## Resolution of the conflicts and open points (2026-11-01)
 
-- **FUN-SAFE-001 / SW-ZCS-021**: on loss of `BODY_LightCmd` (500 ms = 5 × 100 ms), the indicators are switched **off** and the low beam **on**. Decision 7 keeps the indicators working locally instead. Decide what fail-safe means now: indicators off or local, low beam on or unchanged, and which message loss triggers it (`BODY_LightCmd`, the vehicle state, or both).
-- **ECU states (SW-ZCS-020)** and **vehicle states** are two different state machines. Decide whether fail-safe on vehicle-state loss is the existing `Degraded` state or a new one.
+| Item | Resolution |
+|---|---|
+| FUN-SAFE-001 / SW-ZCS-021 | Changed: on loss of `BODY_LightCmd` or `VEH_State` for 500 ms or longer, the low beam goes on, central requests are ignored, and joystick indication and the local hazard switch keep working as in `On`. |
+| ECU states (SW-ZCS-020) | Fail-safe reuses the existing ECU state `Degraded`; no new ECU state. Vehicle states (Off / On / Update) are a separate state machine that the ECU follows. |
+| Hazard input in fail-safe | The joystick push button (FUN-LIGHT-012, SW-ZCS-052). |
+| Cycle time | `VEH_State` every 100 ms; 5 missed cycles = 500 ms (ADR 0007). |
+| Indicators in `Update` | Direction indication off, hazard available (FUN-VEH-001, SW-ZCS-054). |
+| Leaving fail-safe | On the first valid message, once both `BODY_LightCmd` and `VEH_State` are valid again (as before). |
+| Start-up | The vehicle state is treated as `Off` until `VEH_State` is received (SW-ZCS-053). |
 
-## Open points
-
-- **Hazard input in fail-safe**: the dashboard and the HPC cannot be reached then, so hazard must be triggerable **locally on the ZC-STM32**. Which input (a joystick button, user button B1, a separate switch)?
-- Cycle time of the vehicle state message (5 cycles = ? ms; the light command uses 100 ms).
-- Indicator behaviour in `Update`.
-- Leaving fail-safe: immediately on the first valid message, or after N valid messages?
+New requirements: STK-006, SYS-VEH-001, FUN-VEH-001, SW-ZCS-053, SW-ZCS-054.

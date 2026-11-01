@@ -74,6 +74,28 @@ RELATIONS:
 [[/SECTION]]
 
 [[SECTION]]
+TITLE: Vehicle state
+
+[REQUIREMENT]
+UID: SYS-VEH-001
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+MILESTONE: M2
+TITLE: Vehicle states
+STATEMENT: >>>
+The vehicle shall have the vehicle states Off, On and Update, set by one central vehicle state manager, and every vehicle node shall follow the current vehicle state.
+<<<
+RATIONALE: >>>
+One master for the vehicle state gives one source of truth (ADR 0006).
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: STK-006
+
+[[/SECTION]]
+
+[[SECTION]]
 TITLE: Robustness and safe behaviour
 
 [REQUIREMENT]

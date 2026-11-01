@@ -71,11 +71,77 @@ RATIONALE: >>>
 Lane-change convenience; the number of flashes is market-specific (variant coding).
 <<<
 COMMENT: >>>
-Node allocation not decided yet (stalk input on the HPC or edge logic on the ZC-STM32); no component requirement exists until it is.
+Allocated to the ZC-STM32: the joystick is connected to the body zone and the indication logic runs there (ADR 0005).
 <<<
 RELATIONS:
 - TYPE: Parent
   VALUE: SYS-LIGHT-003
+
+[REQUIREMENT]
+UID: FUN-LIGHT-011
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+MILESTONE: M1
+TITLE: Indication while held
+STATEMENT: >>>
+While the driver holds a direction request for 0.5 s or longer, the indicator function shall flash the selected side until the request is released, and shall complete the flash that is in progress.
+<<<
+RATIONALE: >>>
+The joystick springs back to its centre, so it cannot latch like a real stalk. It behaves like the stalk's non-locking "touch" position: a tap gives comfort blink (FUN-LIGHT-010), holding gives continuous indication.
+<<<
+COMMENT: >>>
+Proposed default (2026-11-01). Alternative: latching indication (tap left = on, tap again = off).
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-LIGHT-001
+
+[REQUIREMENT]
+UID: FUN-LIGHT-012
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+MILESTONE: M1
+RELEVANCE: Safety
+TITLE: Hazard request sources
+STATEMENT: >>>
+The hazard warning shall be requested while the driver's local hazard switch is toggled on, or while the central computer requests it.
+<<<
+RATIONALE: >>>
+The local switch keeps hazard available when the central computer cannot be reached (ADR 0006). The central request keeps cross-domain functions possible, e.g. emergency brake to hazard (milestone M5).
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-LIGHT-002
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Vehicle state handling
+
+[REQUIREMENT]
+UID: FUN-VEH-001
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+MILESTONE: M2
+RELEVANCE: Safety
+TITLE: Lighting follows the vehicle state
+STATEMENT: >>>
+While the vehicle state is Off or Update, the indicator function shall not flash for direction requests; the hazard warning shall remain available in every vehicle state.
+<<<
+RATIONALE: >>>
+Production-vehicle concept: direction indication needs the vehicle switched on, hazard works even with the vehicle off (ADR 0006).
+<<<
+COMMENT: >>>
+Proposed default for Update (2026-11-01): direction indication off, hazard available.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-VEH-001
+- TYPE: Parent
+  VALUE: SYS-LIGHT-002
 
 [[/SECTION]]
 
@@ -108,12 +174,15 @@ KIND: Functional
 VERIFICATION: Test
 MILESTONE: M1
 RELEVANCE: Safety
-TITLE: Command-loss fail-safe
+TITLE: Communication-loss fail-safe
 STATEMENT: >>>
-If no valid light command has been received for 500 ms or longer, the lighting functions shall switch the indicators off, switch the low beam on and report a degraded state; when valid commands return, they shall resume normal behaviour automatically.
+If no valid light command or no valid vehicle state has been received for 500 ms or longer, the lighting functions shall switch the low beam on, ignore all central requests, keep direction indication and hazard warning from the driver's local inputs available as in vehicle state On, and report a degraded state; when valid messages return, they shall resume normal behaviour automatically.
 <<<
 RATIONALE: >>>
-Low beam on keeps the vehicle visible; indicators off avoids signalling a direction nobody requested. The 500 ms timeout is five missed 100 ms command cycles (ADR 0002).
+Low beam on keeps the vehicle visible. Local indication and hazard stay usable because they do not depend on the central computer (ADR 0005, ADR 0006). Hazard is not switched on automatically, as in production vehicles. The 500 ms timeout is five missed 100 ms cycles (ADR 0002, ADR 0007).
+<<<
+COMMENT: >>>
+Changed 2026-11-01: before ADR 0005/0006 the indicators were switched off on command loss.
 <<<
 RELATIONS:
 - TYPE: Parent

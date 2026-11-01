@@ -1,0 +1,37 @@
+flowchart LR
+    %% Logical view: turn indication, hazard and vehicle state (ADR 0005, 0006).
+    %% Functions and flows only; roles, not ECUs. Mirrors the Capella LAB "LAB_TurnIndication".
+    OP([Operator]):::actor
+    DRV([Driver]):::actor
+
+    subgraph CGW["Vehicle state management · CGW role"]
+        F2["F2 Manage vehicle state<br/>Off / On / Update"]
+        F12["F12 Display indication status"]
+    end
+
+    subgraph ZC["Body zone lighting · ZC01 role"]
+        F4["F4 Read joystick"]
+        F5["F5 Decode direction request<br/>tap / hold"]
+        F6["F6 Read hazard switch"]
+        F7["F7 Supervise vehicle state<br/>500 ms timeout"]
+        F8["F8 Arbitrate indication<br/>hazard first, state gating"]
+        F9["F9 Generate blink<br/>1.5 Hz, 50 %"]
+        F10["F10 Drive indicator lamps"]
+        F11["F11 Report indication status"]
+    end
+
+    OP -- VehicleStateRequest --> F2
+    F2 -- VehicleState --> F7
+    F2 -- HazardRequest central --> F8
+    DRV -- JoystickPosition --> F4
+    DRV -- HazardPress --> F6
+    F4 -- RawJoystick --> F5
+    F5 -- DirectionRequest --> F8
+    F6 -- HazardRequest local --> F8
+    F7 -- VehicleStateValid --> F8
+    F8 -- IndicationRequest --> F9
+    F9 -- LampCmd --> F10
+    F10 -- LampState --> F11
+    F11 -- IndicationStatus --> F12
+
+    classDef actor fill:#f1efe8,stroke:#5f5e5a

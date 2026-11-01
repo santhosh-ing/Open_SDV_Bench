@@ -15,7 +15,7 @@ Each level refines the one above and is verified by its own test level (V-model)
 
 Later component files follow the same pattern: `31-hpc` (`SW-HPC`), `32-zc-arduino` (`SW-ZCA`), `33-adas` (`SW-ADAS`), `34-cloud` (`SW-CLOUD`).
 
-Areas used so far: `LIGHT` (exterior lighting), `SAFE` (robustness, fail-safe), `DIAG` (diagnostics), `ARCH` (architecture).
+Areas used so far: `LIGHT` (exterior lighting), `SAFE` (robustness, fail-safe), `DIAG` (diagnostics), `ARCH` (architecture), `VEH` (vehicle state).
 
 **Link rules** (enforced by `tools/req_check.py`):
 

@@ -75,19 +75,18 @@ ALLOCATED_TO: ZC-STM32
 VERIFICATION: Test
 MILESTONE: M1
 LEGACY_ID: REQ-BODY-001
-TITLE: Light outputs follow CAN requests
+TITLE: Light outputs and central requests
 STATEMENT: >>>
-The ZC-STM32 shall control its hazard, left indicator, right indicator and low beam outputs according to the requests in BODY_LightCmd, within one 100 ms command cycle.
+The ZC-STM32 shall control its low beam output according to LowBeamReq and use HazardReq as the central hazard request, both within one 100 ms command cycle; it shall take direction requests only from the local joystick, not from the CAN bus.
+<<<
+COMMENT: >>>
+Changed 2026-11-01 (ADR 0005): IndicatorLeftReq and IndicatorRightReq are no longer used; the contract change is proposed in ADR 0007.
 <<<
 RELATIONS:
 - TYPE: Parent
-  VALUE: FUN-LIGHT-001
-- TYPE: Parent
-  VALUE: FUN-LIGHT-002
-- TYPE: Parent
-  VALUE: FUN-LIGHT-003
-- TYPE: Parent
   VALUE: FUN-LIGHT-004
+- TYPE: Parent
+  VALUE: FUN-LIGHT-012
 
 [REQUIREMENT]
 UID: SW-ZCS-011
@@ -138,9 +137,12 @@ ALLOCATED_TO: ZC-STM32
 VERIFICATION: Test
 MILESTONE: M1
 RELEVANCE: Safety
-TITLE: Command timeout handling
+TITLE: Communication timeout handling
 STATEMENT: >>>
-If no valid BODY_LightCmd has been received for 500 ms or longer, the ZC-STM32 shall enter state Degraded, switch the indicator outputs off, switch the low beam output on and set CmdTimeout; when valid commands return, it shall return to state Normal.
+If no valid BODY_LightCmd or no valid VEH_State has been received for 500 ms or longer, the ZC-STM32 shall enter state Degraded, switch the low beam output on, ignore HazardReq and LowBeamReq, keep joystick indication and the local hazard switch working as in vehicle state On, and set CmdTimeout or VehStateTimeout accordingly; when both messages are valid again, it shall return to state Normal.
+<<<
+COMMENT: >>>
+Changed 2026-11-01 (ADR 0006): previously the indicator outputs were switched off. VEH_State and VehStateTimeout are proposed in ADR 0007.
 <<<
 RELATIONS:
 - TYPE: Parent
@@ -180,6 +182,140 @@ The ZC-STM32 shall behave deterministically during start-up and normal operation
 RELATIONS:
 - TYPE: Parent
   VALUE: SYS-SAFE-002
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Driver inputs
+
+[REQUIREMENT]
+UID: SW-ZCS-050
+STATUS: Draft
+KIND: Functional
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Test
+MILESTONE: M1
+TITLE: Joystick direction classification
+STATEMENT: >>>
+The ZC-STM32 shall sample the joystick X axis every 10 ms with 12-bit resolution and classify it as left below 1024, right above 3072 and neutral between 1536 and 2560, keep the previous classification in between (hysteresis), and use a new classification only after it has been stable for 50 ms.
+<<<
+RATIONALE: >>>
+Hysteresis and a stability time prevent flicker around the thresholds and from mechanical bounce.
+<<<
+COMMENT: >>>
+Which end of the axis is "left" depends on how the joystick is mounted: a named constant, checked on the bench. Thresholds are candidates for parameters (OTA demo, later).
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: FUN-LIGHT-001
+- TYPE: Parent
+  VALUE: FUN-LIGHT-010
+- TYPE: Parent
+  VALUE: FUN-LIGHT-011
+
+[REQUIREMENT]
+UID: SW-ZCS-051
+STATUS: Draft
+KIND: Functional
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Test
+MILESTONE: M1
+TITLE: Tap and hold
+STATEMENT: >>>
+When a joystick direction returns to neutral less than 500 ms after it was classified, the ZC-STM32 shall flash that side 3 times (comfort blink); while a direction stays classified for 500 ms or longer, it shall flash that side until the joystick returns to neutral.
+<<<
+COMMENT: >>>
+A new direction request cancels a running comfort blink and starts the new one.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: FUN-LIGHT-010
+- TYPE: Parent
+  VALUE: FUN-LIGHT-011
+
+[REQUIREMENT]
+UID: SW-ZCS-052
+STATUS: Draft
+KIND: Functional
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Test
+MILESTONE: M1
+RELEVANCE: Safety
+TITLE: Local hazard switch
+STATEMENT: >>>
+The ZC-STM32 shall debounce the joystick push button and toggle its local hazard request on each press, in every vehicle state and in state Degraded.
+<<<
+RATIONALE: >>>
+Hazard must be switchable when the central computer is unreachable (ADR 0006).
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: FUN-LIGHT-012
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Vehicle state
+
+[REQUIREMENT]
+UID: SW-ZCS-053
+STATUS: Draft
+KIND: Functional
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Test
+MILESTONE: M2
+RELEVANCE: Safety
+TITLE: Vehicle state reception
+STATEMENT: >>>
+The ZC-STM32 shall use VEH_State only after validating its CAN ID, a DLC of 8 and its alive counter, and shall apply a valid vehicle state within one 100 ms cycle.
+<<<
+COMMENT: >>>
+VEH_State is proposed in ADR 0007 (body.dbc v0.2.0). Until it is received for the first time after start-up, the ZC-STM32 treats the vehicle state as Off.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: FUN-VEH-001
+
+[REQUIREMENT]
+UID: SW-ZCS-054
+STATUS: Draft
+KIND: Functional
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Test
+MILESTONE: M2
+RELEVANCE: Safety
+TITLE: Indication gated by the vehicle state
+STATEMENT: >>>
+While the vehicle state is Off or Update and the ZC-STM32 is not in state Degraded, it shall ignore joystick direction requests and cancel any running indication, while hazard remains available.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: FUN-VEH-001
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Hardware
+
+[REQUIREMENT]
+UID: HW-ZCS-001
+STATUS: Draft
+KIND: Constraint
+ALLOCATED_TO: ZC-STM32
+VERIFICATION: Inspection
+MILESTONE: M1
+TITLE: Joystick connection
+STATEMENT: >>>
+The joystick shall be powered from the 3V supply of the STM32F407G-DISC1, with its X axis on PA1 (ADC1_IN1), its Y axis on PA2 (ADC1_IN2, reserved) and its push button on PE7 with the internal pull-up enabled.
+<<<
+RATIONALE: >>>
+The axis outputs follow the supply, and the ADC inputs accept at most 3.3 V. The pins are not used by on-board peripherals (MB997 schematic). Wiring: docs/hardware/wiring/joystick.yml.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: FUN-LIGHT-011
+- TYPE: Parent
+  VALUE: FUN-LIGHT-012
 
 [[/SECTION]]
 
