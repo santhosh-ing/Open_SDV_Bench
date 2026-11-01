@@ -2,6 +2,12 @@
 
 Short, dated entries: what was done, what was learned, what's next. Newest at the top.
 
+## 2026-11-01 (night)
+
+- Spec 001 verified on the board: lamp test, 1 Hz heartbeat, 10 button presses = 10 orange toggles, button held through reset = no toggle. Debugger after 60 s by stopwatch: `g_sched_uptime_ms` and `g_sched_task100_count` within tolerance, `g_ecu_state` = Normal.
+- SW-ZCS-023 (deterministic timing) set to Verified. SW-ZCS-022 stays Draft until its Degraded part (4 Hz heartbeat) is built in spec 002.
+- **Next:** spec 004, joystick turn indication and hazard (`docs/spec-inputs/04-body-ecu-joystick-indication.md`).
+
 ## 2026-11-01 (evening)
 
 - Joystick wired on paper: KY-023 on PA1 (X axis), PE7 (push = hazard), powered from 3V (PR #10).

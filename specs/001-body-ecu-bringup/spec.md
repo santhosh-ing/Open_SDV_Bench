@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-14
 
-**Status**: Implemented — awaiting verification on the board
+**Status**: Verified on the board (2026-11-01)
 
 **Input**: `docs/spec-inputs/01-body-ecu-bringup.md`, Part A — prove the toolchain and the firmware skeleton (layers, scheduler, board support) of the body zone ECU on the real STM32F407G-DISC1 board, before any CAN.
 

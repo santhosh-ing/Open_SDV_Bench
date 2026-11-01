@@ -41,9 +41,9 @@
 
 See [quickstart.md](quickstart.md) for the exact steps.
 
-- [ ] T018 Build and flash the Debug preset; board starts
-- [ ] T019 SC-001: reset → all 4 LEDs on for ~1 s → all off → blue blinks 1 Hz
-- [ ] T020 SC-002: 10 button presses → orange toggles exactly 10 times (orange is off again after an even count)
-- [ ] T021 Edge case: hold the button through reset → no toggle until released and pressed again
-- [ ] T022 SC-003: live expressions `g_sched_uptime_ms` ≈ 60000 after 60 s by stopwatch (± 600); `g_sched_task100_count` ≈ uptime / 100; `g_ecu_state` = `ECU_STATE_NORMAL`
-- [ ] T023 Record the result in `docs/devlog.md`; set the spec status to Verified
+- [x] T018 Build and flash the Debug preset; board starts
+- [x] T019 SC-001: reset → all 4 LEDs on for ~1 s → all off → blue blinks 1 Hz
+- [x] T020 SC-002: 10 button presses → orange toggles exactly 10 times (orange is off again after an even count)
+- [x] T021 Edge case: hold the button through reset → no toggle until released and pressed again
+- [x] T022 SC-003: live expressions `g_sched_uptime_ms` ≈ 60000 after 60 s by stopwatch (± 600); `g_sched_task100_count` ≈ uptime / 100; `g_ecu_state` = `ECU_STATE_NORMAL`
+- [x] T023 Record the result in `docs/devlog.md`; set the spec status to Verified
