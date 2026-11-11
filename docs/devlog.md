@@ -2,6 +2,13 @@
 
 Short, dated entries: what was done, what was learned, what's next. Newest at the top.
 
+## 2026-11-10
+
+- electronica Munich, edge lab LIVE! workshops: FRDM Automotive (NXP FRDM-A-S32K344) and LVGL on Riverdi's 5″ STM32U5 display. Also collected an NXP FRDM-MCXA156, an ST debug probe and two Renesas FPB-RA2E3 kits with PTX105R NFC reader, NFC cards and SG90 servo.
+- Added to `docs/hardware/bom.md` as **candidate boards**. Candidate roles (ideas only, `parking-lot` issues): rear zone controller ZC02 (S32K344, CAN FD), LIN smart node (MCXA156), instrument cluster (Riverdi + LVGL), door / digital-key module (RA2E3 + NFC + servo).
+- ADR 0003 and the website topology are unchanged: a board joins the topology only through its own ADR.
+- **Next:** unchanged, spec 004 (joystick turn indication) on the STM32 body zone.
+
 ## 2026-11-01 (night)
 
 - Spec 001 verified on the board: lamp test, 1 Hz heartbeat, 10 button presses = 10 orange toggles, button held through reset = no toggle. Debugger after 60 s by stopwatch: `g_sched_uptime_ms` and `g_sched_task100_count` within tolerance, `g_ecu_state` = Normal.

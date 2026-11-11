@@ -1,0 +1,28 @@
+%% Target topology: accepted nodes (ADR 0003, solid) plus candidate nodes (dashed, not decided).
+%% Candidates come from the electronica 2026 boards, see docs/hardware/bom.md and parking-lot issues 18-21.
+%% A candidate becomes accepted only through its own ADR; then this file and ADR 0003 change together.
+flowchart TB
+  CLOUD["OpenSDV.Cloud<br/>OTA, remote diagnostics"]
+  ADAS["ADAS domain<br/>Jetson Orin"]
+  HPC["Central HPC / CGW<br/>Raspberry Pi 5"]
+  ZCA["ZC-Arduino<br/>Sensor zone"]
+  ZCS["ZC-STM32<br/>Body zone, front"]
+  CLU["Candidate: instrument cluster<br/>Riverdi 5in STM32U5, LVGL<br/>issue 20"]
+  ZC2["Candidate: ZC02 rear zone<br/>FRDM-A-S32K344<br/>issue 18"]
+  DOOR["Candidate: door / digital key<br/>FPB-RA2E3 + NFC + servo<br/>issue 21"]
+  LIN["Candidate: LIN smart node<br/>FRDM-MCXA156<br/>issue 19"]
+
+  CLOUD -.-|"IP: MQTT / HTTPS"| HPC
+  HPC ---|Ethernet| ADAS
+  HPC ---|Ethernet| ZCA
+  HPC ---|"CAN 500 kbit/s"| ZCS
+
+  HPC -.-|"bus open: CAN FD or Ethernet"| CLU
+  HPC -.-|"CAN FD, 2nd HAT channel"| ZC2
+  ZC2 -.-|LIN| LIN
+  ZC2 -.-|"open: CAN via MCP2515 or UART"| DOOR
+
+  classDef accepted stroke-width:2px
+  classDef candidate stroke-dasharray:6 4
+  class CLOUD,ADAS,HPC,ZCA,ZCS accepted
+  class CLU,ZC2,DOOR,LIN candidate
