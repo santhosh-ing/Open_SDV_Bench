@@ -38,6 +38,19 @@ A **central HPC star**: the Raspberry Pi 5 is the hub. Every zone controller and
 - **Ethernet ports**: the Pi 5 has one Ethernet port. With the Jetson and the Arduino on Ethernet, either a small unmanaged switch is added, or the cloud link uses the Pi's Wi-Fi (preferred, mirrors the vehicle's cellular uplink).
 - **Protocols per link** are planned, not final. Each is confirmed by an ADR when its milestone starts.
 
+## Target topology (candidates, not decided)
+
+The goal picture of the bench: the accepted star above plus **candidate nodes** from the boards collected at electronica 2026 ([BOM, candidate boards](../../hardware/bom.md)). Candidates are drawn dashed in [`target-topology.mmd`](target-topology.mmd) (rendered at the end of this page).
+
+This section is an overview so that no idea gets lost. It is **not a decision**: ADR 0003 and the diagram above stay the accepted topology. A candidate becomes accepted only through its own ADR (from ADR 0008) when its milestone starts; then ADR 0003, the draw.io diagram, this section and the website topology change in the same pull request.
+
+| Candidate node | Hardware | Idea | Link (open) | Issue |
+|---|---|---|---|---|
+| ZC02, rear zone | NXP FRDM-A-S32K344 | Rear indicators following the CGW vehicle state (one function across two zones); later HSE for secure boot / signed OTA | CAN FD on the second channel of the Pi's CAN HAT | [#18](https://github.com/santhosh-ing/Open_SDV_Bench/issues/18) |
+| LIN smart node | NXP FRDM-MCXA156 | LIN slave under ZC02 (mirror, ambient light), or rest-bus / fault-injection node | LIN from ZC02 | [#19](https://github.com/santhosh-ing/Open_SDV_Bench/issues/19) |
+| Instrument cluster | Riverdi 5″ STM32U5 display, LVGL | Tell-tales, vehicle state, update progress, DTCs. Open: display only, or also the state-setting dashboard of ADR 0006 | CAN FD or Ethernet, to be checked | [#20](https://github.com/santhosh-ing/Open_SDV_Bench/issues/20) |
+| Door / digital key | Renesas FPB-RA2E3 + PTX105R NFC + SG90 servo | Valid NFC card unlocks the door and enables Off → On; DTC on repeated invalid cards | CAN via MCP2515 (SPI) or UART to ZC02, to be checked | [#21](https://github.com/santhosh-ing/Open_SDV_Bench/issues/21) |
+
 ## Function-to-node mapping
 
 See the [deployment view](../deployment/README.md).
