@@ -12,19 +12,19 @@ Fill in exact models where marked `?` (M0 issue "Hardware inventory").
 | NVIDIA Jetson | Jetson Orin (variant: ?) | 1 | ADAS domain | have |
 | Arduino | ? (model) | 2 | Sensor zone controller (ZC-Arduino, Ethernet) | have |
 
-## Candidate boards (electronica 2026, not yet allocated)
+## Nodes added by ADR 0008 (electronica 2026)
 
-Collected at electronica Munich on 2026-11-10. These boards are **on the bench but have no role yet**. ADR 0003 (topology) is unchanged. Each candidate role below is an idea tracked as a `parking-lot` issue and becomes part of the topology only through its own ADR when its milestone starts.
+Collected at electronica Munich on 2026-11-10 and allocated to the topology by [ADR 0008](../adr/0008-extended-bench-topology.md). No milestone yet; the current focus stays the ZC-STM32 (M1).
 
-| Item | Exact model | Qty | Candidate role (not decided) | Status |
+| Item | Exact model | Qty | Role (node) | Status |
 |---|---|---|---|---|
-| NXP FRDM Automotive board | FRDM-A-S32K344 (S32K344, Cortex-M7 lockstep, CAN FD, LIN, Ethernet, on-board debugger) | 1 | Second zone controller (rear zone) | have |
-| NXP FRDM board | FRDM-MCXA156 (MCX A156, Cortex-M33 96 MHz, on-board MCU-Link) | 1 | LIN smart node or rest-bus / fault-injection node | have |
-| Riverdi STM32 Embedded Display | 5″ 800×480, STM32U599/U5A9 (exact Riverdi part no.: ?) | 1 | Instrument cluster (tell-tales, vehicle state, DTCs), LVGL | have |
+| NXP FRDM Automotive board | FRDM-A-S32K344 (S32K344, Cortex-M7 lockstep, CAN FD, LIN, Ethernet, on-board debugger) | 1 | Rear body zone controller (ZC-S32K, ZC02), CAN FD, LIN master | have |
+| NXP FRDM board | FRDM-MCXA156 (MCX A156, Cortex-M33 96 MHz, on-board MCU-Link) | 1 | LIN smart node (LIN-MCXA) below ZC-S32K | have |
+| Riverdi STM32 Embedded Display | 5″ 800×480, STM32U599/U5A9 (exact Riverdi part no.: ?) | 1 | Instrument cluster (Cluster), LVGL | have |
 | ST debug probe | ST-LINK (exact model: ?) | 1 | SWD debugger for the Riverdi display | have |
-| Renesas Fast Prototyping Board | FPB-RA2E3 (RA2E3, Cortex-M23 48 MHz; confirm on silkscreen) | 2 | Door / digital-key module | have |
-| NFC reader | Renesas PTX105R Pmod board, with NFC cards | 2 | NFC key reader for the door module | have |
-| Servo motor | SG90 | 2 | Door lock actuator | have |
+| Renesas Fast Prototyping Board | FPB-RA2E3 (RA2E3, Cortex-M23 48 MHz; confirm on silkscreen) | 2 | Door / digital-key module (ZC-Door); second kit = development and spare unit | have |
+| NFC reader | Renesas PTX105R Pmod board, with NFC cards | 2 | NFC key reader of ZC-Door | have |
+| Servo motor | SG90 | 2 | Door lock actuator of ZC-Door | have |
 
 ## Actuators, I/O and wiring
 
@@ -40,9 +40,11 @@ Collected at electronica Munich on 2026-11-10. These boards are **on the bench b
 | Item | Suggested model | Qty | Role | Status |
 |---|---|---|---|---|
 | CAN transceiver 3.3 V | SN65HVD230 module | 1–2 | STM32 to CAN bus | needed |
-| CAN controller + transceiver | MCP2515 module | 2 | Arduino to CAN bus (not needed since ADR 0003; Arduino uses Ethernet). Possible CAN link for the candidate Renesas door module (RA2E3 has no CAN, to be confirmed) | have (8) |
-| CAN interface for the Pi | CAN HAT (e.g. Waveshare 2-CH CAN FD) or USB-CAN (candleLight) | 1 | Pi to CAN bus (SocketCAN) | needed |
-| Termination resistors | 120 Ω | 2 | Bus ends | needed |
+| CAN controller + transceiver | MCP2515 module | 2 | Arduino to CAN bus (not needed since ADR 0003; Arduino uses Ethernet). Planned body-CAN link of ZC-Door (ADR 0008; classic CAN only, not for the CAN FD bus) | have (8) |
+| CAN interface for the Pi | 2-channel, at least one CAN FD capable (e.g. Waveshare 2-CH CAN FD HAT) | 1 | Pi to the body CAN and the CAN FD bus (SocketCAN), ADR 0008 | needed |
+| Termination resistors | 120 Ω | 4 | Ends of the body CAN and the CAN FD bus | needed |
+| LIN transceiver | e.g. TJA1021 / MCP2003 module (check the FRDM board manuals first) | 2 | ZC-S32K and LIN-MCXA to the LIN bus, ADR 0008 | needed |
+| 12 V supply | – | 1 | LIN bus supply | needed |
 | Twisted pair wire | – | – | CAN_H / CAN_L | needed |
 | 5 V supply | ≥ 2 A | 1 | Servos (separate from logic boards) | needed |
 

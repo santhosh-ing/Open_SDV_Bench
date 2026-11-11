@@ -4,7 +4,7 @@ Single source of rules for every AI coding assistant working in this repository 
 
 ## Project
 
-**Open SDV Bench** is an open-source desktop software-defined-vehicle bench: a central vehicle computer (Raspberry Pi 5) running Eclipse SDV components (Kuksa Databroker + COVESA VSS, Eclipse OpenSOVD, later Ankaios), connected to an STM32 body zone controller over CAN, an Arduino sensor zone controller and an ADAS domain (NVIDIA Jetson Orin) over Ethernet, and a cloud backend (OpenSDV.Cloud) over IP. Topology: ADR 0003. It is developed with systems-engineering discipline: requirements, architecture, decisions and traceability are first-class.
+**Open SDV Bench** is an open-source desktop software-defined-vehicle bench: a central vehicle computer (Raspberry Pi 5) running Eclipse SDV components (Kuksa Databroker + COVESA VSS, Eclipse OpenSOVD, later Ankaios), connected to an STM32 front body zone controller and a door / digital-key module (Renesas RA2E3) over CAN, an NXP S32K344 rear body zone controller over CAN FD with an NXP MCXA156 LIN node below it, an instrument cluster (Riverdi STM32U5 display), an Arduino sensor zone controller and an ADAS domain (NVIDIA Jetson Orin) over Ethernet, and a cloud backend (OpenSDV.Cloud) over IP. Topology: ADR 0003, extended by ADR 0008. It is developed with systems-engineering discipline: requirements, architecture, decisions and traceability are first-class.
 
 The maintainer is a systems architect, not a professional programmer. Explain non-obvious embedded concepts briefly in comments or plans.
 
@@ -23,6 +23,7 @@ The maintainer is a systems architect, not a professional programmer. Explain no
 | `specs/` | Spec Kit feature folders (`NNN-name/spec.md, plan.md, tasks.md`) | Created by `/speckit-*` commands |
 | `ecus/body-zone-stm32/` | STM32F407G-DISC1 firmware | See "Firmware layering" |
 | `ecus/sensor-zone-arduino/` | Arduino sensor zone ECU | Later milestone |
+| `ecus/<node>/` for ZC-S32K, LIN-MCXA, Cluster, ZC-Door | Nodes added by ADR 0008 | Folder is created with the node's first spec, not before |
 | `ecus/virtual/` | Python virtual twins of the ECUs | Same contracts as hardware |
 | `hpc/` | Raspberry Pi: `apps/`, `config/`, `diag/` | Later milestone |
 | `adas-jetson/` | Jetson Orin perception | Later milestone |

@@ -2,7 +2,7 @@
 
 **A software-defined vehicle on your desk, built from hobby hardware and the Eclipse SDV stack, and engineered the way real automotive systems are: requirements → architecture → decisions → code → test.**
 
-Open SDV Bench connects a cloud backend, a central vehicle computer, an ADAS domain and two zone controllers into one small but realistic vehicle E/E architecture. It mixes CAN and Ethernet, runs open-source Eclipse SDV components, and every function can be traced from a requirement down to a blinking LED on the bench.
+Open SDV Bench connects a cloud backend, a central vehicle computer, an ADAS domain, four zone controllers (front and rear body, sensor, door), a LIN smart node and an instrument cluster into one small but realistic vehicle E/E architecture. It mixes CAN, CAN FD, LIN and Ethernet, runs open-source Eclipse SDV components, and every function can be traced from a requirement down to a blinking LED on the bench.
 
 **Website:** <https://santhosh-ing.github.io/Open_SDV_Bench/> — architecture, requirements report, roadmap and devlog in one place.
 
@@ -39,8 +39,14 @@ The end-to-end story the bench builds towards:
 | OpenSDV.Cloud | Laptop / cloud VM | OTA update server, digital twin, remote diagnostics | IP (MQTT / HTTPS) |
 | Central HPC | Raspberry Pi 5 | Vehicle computer: VSS Databroker, vehicle apps, diagnostics gateway, orchestration | Hub of the bench |
 | ADAS domain | NVIDIA Jetson Orin | Camera perception, publishes detections as VSS signals | Ethernet (gRPC) |
-| ZC-STM32 | STM32F407G-DISC1 | Body zone controller: lighting, indicators, hazard, fail-safe, UDS server | CAN 500 kbit/s |
+| ZC-STM32 (ZC01) | STM32F407G-DISC1 | Front body zone controller: lighting, indicators, hazard, fail-safe, UDS server | CAN 500 kbit/s |
 | ZC-Arduino | Arduino + Ethernet shield | Sensor zone controller: speed and distance sensing | Ethernet (MQTT) |
+| ZC-S32K (ZC02) | NXP FRDM-A-S32K344 | Rear body zone controller: rear lighting, LIN master, UDS server | CAN FD |
+| LIN-MCXA | NXP FRDM-MCXA156 | LIN smart node below the rear zone | LIN |
+| Cluster | Riverdi 5″ STM32U5 display | Instrument cluster (LVGL): tell-tales, vehicle state, DTCs | CAN FD or Ethernet (open) |
+| ZC-Door | Renesas FPB-RA2E3 + NFC + servo | Door / digital-key module | Body CAN via MCP2515 (open) |
+
+Topology: [ADR 0003](docs/adr/0003-bench-network-topology.md), extended by [ADR 0008](docs/adr/0008-extended-bench-topology.md). Only the ZC-STM32 is in active development (M1); the other new nodes have no milestone yet.
 
 Planned Eclipse / open-source stack (each component is confirmed by an ADR when its milestone starts):
 

@@ -71,6 +71,26 @@ RELATIONS:
 - TYPE: Parent
   VALUE: STK-002
 
+[REQUIREMENT]
+UID: SYS-LIGHT-005
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+RELEVANCE: Safety
+TITLE: Front and rear indication in phase
+STATEMENT: >>>
+The vehicle shall show direction indication and the hazard warning signal at the front and at the rear, with all active indicator lamps flashing in phase.
+<<<
+RATIONALE: >>>
+Other road users must see the signal from both directions. With the extended topology (ADR 0008) front and rear lamps sit on two zone controllers (ZC-STM32, ZC-S32K).
+<<<
+COMMENT: >>>
+How the two zones stay in phase is open (ADR 0008). It may revise ADR 0005, where indication is local to the ZC-STM32.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: STK-001
+
 [[/SECTION]]
 
 [[SECTION]]
@@ -92,6 +112,86 @@ One master for the vehicle state gives one source of truth (ADR 0006).
 RELATIONS:
 - TYPE: Parent
   VALUE: STK-006
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Access
+
+[REQUIREMENT]
+UID: SYS-ACC-001
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+RELEVANCE: Security
+TITLE: Unlock with a valid key
+STATEMENT: >>>
+When a valid key is presented at the door, the vehicle shall unlock the door; when an invalid key is presented, the vehicle shall keep the door locked and record the attempt as a fault event.
+<<<
+COMMENT: >>>
+Response time to be agreed. On the bench a key is an NFC card read by the ZC-Door (ADR 0008). Matching only the card UID is a known demo limitation.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: STK-007
+
+[REQUIREMENT]
+UID: SYS-ACC-002
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+RELEVANCE: Security
+TITLE: Valid key before vehicle On
+STATEMENT: >>>
+The vehicle shall change its vehicle state from Off to On only after a valid key has been presented.
+<<<
+RATIONALE: >>>
+The key is an input to the central vehicle state manager, not a second mode source (ADR 0006, ADR 0008).
+<<<
+COMMENT: >>>
+Open: how this combines with the dashboard that sets the vehicle state today (ADR 0006).
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: STK-006
+- TYPE: Parent
+  VALUE: STK-007
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Driver information
+
+[REQUIREMENT]
+UID: SYS-HMI-001
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+TITLE: Driver information display
+STATEMENT: >>>
+The vehicle shall display to the driver the direction indication and hazard status, the current vehicle state and whether faults are active.
+<<<
+COMMENT: >>>
+On the bench this is the instrument cluster (Riverdi display, ADR 0008). Whether the cluster may also set the vehicle state is open.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: STK-008
+
+[REQUIREMENT]
+UID: SYS-HMI-002
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Test
+TITLE: Update progress display
+STATEMENT: >>>
+While the vehicle state is Update, the vehicle shall display the progress and the result of the software update to the driver.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: STK-006
+- TYPE: Parent
+  VALUE: STK-008
 
 [[/SECTION]]
 
