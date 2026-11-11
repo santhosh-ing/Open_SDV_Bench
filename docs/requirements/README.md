@@ -13,9 +13,9 @@ Each level refines the one above and is verified by its own test level (V-model)
 | `20-function-requirements.sdoc` | Logical functions, node-independent | `FUN-<AREA>-NNN` | Integration tests (HPC + virtual twins) |
 | `30-zc-stm32-requirements.sdoc` | Component: body zone controller | `SW-ZCS-NNN`, `HW-ZCS-NNN` | Host unit tests, tests on the board |
 
-Later component files follow the same pattern: `31-hpc` (`SW-HPC`), `32-zc-arduino` (`SW-ZCA`), `33-adas` (`SW-ADAS`), `34-cloud` (`SW-CLOUD`).
+Later component files follow the same pattern: `31-hpc` (`SW-HPC`), `32-zc-arduino` (`SW-ZCA`), `33-adas` (`SW-ADAS`), `34-cloud` (`SW-CLOUD`), and for the nodes added by ADR 0008: `35-zc-s32k` (`SW-ZCK`), `36-lin-mcxa` (`SW-LIN`), `37-cluster` (`SW-CLU`), `38-zc-door` (`SW-DOOR`).
 
-Areas used so far: `LIGHT` (exterior lighting), `SAFE` (robustness, fail-safe), `DIAG` (diagnostics), `ARCH` (architecture), `VEH` (vehicle state).
+Areas used so far: `LIGHT` (exterior lighting), `SAFE` (robustness, fail-safe), `DIAG` (diagnostics), `ARCH` (architecture), `VEH` (vehicle state), `ACC` (access, digital key), `HMI` (driver information).
 
 **Link rules** (enforced by `tools/req_check.py`):
 
@@ -32,7 +32,7 @@ Defined once in the shared grammar `bench.sgra`:
 | `UID` | yes | Stable ID. Never reused, never renamed. |
 | `STATUS` | yes | `Draft` → `Agreed` → `Implemented` → `Verified`, or `Obsolete` |
 | `KIND` | yes | `Functional`, `Non-functional`, `Constraint` |
-| `ALLOCATED_TO` | component level | Node: `ZC-STM32`, `HPC`, `ZC-Arduino`, `ADAS`, `Cloud` |
+| `ALLOCATED_TO` | component level | Node: `ZC-STM32`, `HPC`, `ZC-Arduino`, `ADAS`, `Cloud`, and (ADR 0008) `ZC-S32K`, `LIN-MCXA`, `Cluster`, `ZC-Door` |
 | `VERIFICATION` | yes | `Test`, `Demonstration`, `Inspection`, `Analysis` |
 | `MILESTONE` | no | `M1` … `M8` |
 | `RELEVANCE` | no | `Safety`, `Security` (both possible) |

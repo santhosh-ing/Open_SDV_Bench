@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted. Extended by [ADR 0008](0008-extended-bench-topology.md) (rear zone ZC-S32K, LIN node, instrument cluster, door module); this ADR stays valid.
 
 ## Context
 

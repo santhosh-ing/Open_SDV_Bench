@@ -15,7 +15,7 @@ Inspired by the layers of an E/E architecture tool (requirements → logical →
 
 ## 1. Introduction and goals
 
-A desktop software-defined-vehicle bench that demonstrates a realistic SDV architecture: a central vehicle computer with Eclipse SDV components (Kuksa Databroker + VSS, Eclipse OpenSOVD, Ankaios), zone controllers on CAN and Ethernet, an ADAS domain, and a cloud backend for OTA and remote diagnostics (ADR 0003). Quality goals: traceability, modularity, runnable without hardware (virtual twins).
+A desktop software-defined-vehicle bench that demonstrates a realistic SDV architecture: a central vehicle computer with Eclipse SDV components (Kuksa Databroker + VSS, Eclipse OpenSOVD, Ankaios), zone controllers on CAN, CAN FD and Ethernet with a LIN sub-bus, an instrument cluster, an ADAS domain, and a cloud backend for OTA and remote diagnostics (ADR 0003, ADR 0008). Quality goals: traceability, modularity, runnable without hardware (virtual twins).
 
 ## 2. Constraints
 

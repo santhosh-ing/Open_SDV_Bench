@@ -9,7 +9,12 @@ Which function or workload runs on which node. Physical connections: see the [ne
 | ZC-STM32 | UDS diagnostic server (DIDs, DTCs, IO control) | Firmware, `app/diag/` | M3 |
 | ZC-STM32 | Mirror fold (servo) | Firmware, `app/functions/` | later |
 | ZC-Arduino | Speed (potentiometer) and distance sensing | PlatformIO firmware, MQTT client | M5 |
-| HPC | Vehicle state manager (CGW role, Off / On / Update) and dashboard (ADR 0006) | `VEH_State` on CAN (ADR 0007), dashboard app | M2 |
+| ZC-S32K | Rear lighting (rear indicators in step with the front: open, ADR 0008), LIN master, UDS server, following the vehicle state | Firmware, S32 Design Studio / RTD (planned) | not planned yet |
+| ZC-S32K | Secure boot and signed updates (HSE) | Firmware | later |
+| LIN-MCXA | LIN smart node: mirror or ambient light (open) | Firmware, MCUXpresso SDK (planned) | not planned yet |
+| Cluster | Instrument cluster: tell-tales, vehicle state, update progress, DTCs | LVGL on STM32U5 | not planned yet |
+| ZC-Door | NFC key reading, door lock (servo), key events to the CGW | Firmware, Renesas FSP; PTX105R and PWM servo building blocks | not planned yet |
+| HPC | Vehicle state manager (CGW role, Off / On / Update) and dashboard (ADR 0006); key events from ZC-Door are an input (ADR 0008) | `VEH_State` on CAN (ADR 0007), dashboard app | M2 |
 | HPC | VSS Databroker | Eclipse Kuksa Databroker (container) | M2 |
 | HPC | CAN ↔ VSS mapping | Kuksa CAN provider, `interfaces/can/body.dbc` | M2 |
 | HPC | Vehicle apps: light control, brake assist | Python apps, Eclipse Velocitas model, Kuksa client | M2, M5 |

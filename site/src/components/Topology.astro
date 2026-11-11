@@ -1,54 +1,81 @@
 ---
-// Topology.astro — spec 003, FR-007: bench network topology (ADR 0003) as inline SVG.
-// Central HPC star: IP to the cloud, Ethernet to ADAS and the sensor zone, CAN to the body zone.
-// Two layouts: a wide star for desktop, a stacked one for phones (FR-014) so labels stay readable.
-type Node = { id: string; title: string; sub: string; hub?: boolean };
+// Topology.astro — spec 003, FR-007: bench network topology (ADR 0003, extended by ADR 0008) as inline SVG.
+// Central HPC star: IP to the cloud, Ethernet to ADAS and the sensor zone, CAN to the front body zone and
+// the door module, CAN FD to the rear body zone (with a LIN node below it), open medium to the cluster.
+// Two layouts: a wide star for desktop, and for phones (FR-014) one column of nodes fanned from the HPC.
+type Node = { id: string; title: string; sub: string; hub?: boolean; focus?: boolean };
+type Link = { from?: string; to: string; label: string; kind: 'ip' | 'eth' | 'can' | 'canfd' | 'lin' | 'open' };
 type Pos = Record<string, [number, number]>;
 type LabelPos = Record<string, [number, number, 'start' | 'middle' | 'end']>;
+type Layout = { cls: string; w: number; h: number; box: Record<string, [number, number]>; pos: Pos; label: LabelPos; edges?: boolean };
 
 const nodes: Node[] = [
   { id: 'cloud', title: 'OpenSDV.Cloud', sub: 'OTA · remote diagnostics' },
   { id: 'adas', title: 'ADAS domain', sub: 'Jetson Orin' },
-  { id: 'hpc', title: 'Central HPC', sub: 'Raspberry Pi 5', hub: true },
+  { id: 'hpc', title: 'Central HPC', sub: 'Raspberry Pi 5 · CGW', hub: true },
+  { id: 'cluster', title: 'Cluster', sub: 'Riverdi 5″ · LVGL' },
+  { id: 'zcs', title: 'ZC-STM32', sub: 'Front body zone', focus: true },
+  { id: 'door', title: 'ZC-Door', sub: 'NFC key · door lock' },
+  { id: 's32k', title: 'ZC-S32K', sub: 'Rear body zone' },
   { id: 'zca', title: 'ZC-Arduino', sub: 'Sensor zone' },
-  { id: 'zcs', title: 'ZC-STM32', sub: 'Body zone · lights · UDS' },
+  { id: 'lin', title: 'LIN-MCXA', sub: 'LIN smart node' },
 ];
-const links = [
+const links: Link[] = [
   { to: 'cloud', label: 'IP · MQTT / HTTPS', kind: 'ip' },
   { to: 'adas', label: 'Ethernet', kind: 'eth' },
+  { to: 'cluster', label: 'CAN FD / ETH', kind: 'open' },
+  { to: 'zcs', label: 'CAN', kind: 'can' },
+  { to: 'door', label: 'CAN', kind: 'can' },
+  { to: 's32k', label: 'CAN FD', kind: 'canfd' },
   { to: 'zca', label: 'Ethernet', kind: 'eth' },
-  { to: 'zcs', label: 'CAN 500 kbit/s', kind: 'can' },
+  { from: 's32k', to: 'lin', label: 'LIN', kind: 'lin' },
 ];
 
-const layouts = [
+const layouts: Layout[] = [
   {
-    cls: 'wide', w: 640, h: 400, box: [160, 58],
-    pos: { cloud: [320, 50], adas: [90, 200], hpc: [320, 200], zca: [550, 200], zcs: [320, 350] } as Pos,
-    label: { cloud: [330, 129, 'start'], adas: [205, 192, 'middle'], zca: [435, 192, 'middle'], zcs: [330, 279, 'start'] } as LabelPos,
+    cls: 'wide', w: 760, h: 490,
+    box: { default: [150, 58] },
+    pos: { cloud: [380, 45], adas: [95, 175], hpc: [380, 175], cluster: [665, 175],
+           zcs: [95, 320], door: [285, 320], s32k: [475, 320], zca: [665, 320], lin: [475, 445] },
+    label: { cloud: [390, 114, 'start'], adas: [237, 166, 'middle'], cluster: [522, 166, 'middle'],
+             zcs: [218, 252, 'end'], door: [320, 268, 'end'], s32k: [446, 268, 'start'], zca: [540, 252, 'start'],
+             lin: [485, 388, 'start'] },
   },
   {
-    cls: 'narrow', w: 360, h: 520, box: [150, 58],
-    pos: { cloud: [180, 40], hpc: [180, 180], adas: [90, 330], zca: [270, 330], zcs: [180, 470] } as Pos,
-    label: { cloud: [190, 114, 'start'], adas: [120, 250, 'end'], zca: [240, 250, 'start'], zcs: [190, 410, 'start'] } as LabelPos,
+    // Phones: nodes in one column, links fan out from the HPC's left edge to each node's right edge,
+    // so no line crosses another box. Link labels are left out; the caption keys the colours.
+    cls: 'narrow', w: 360, h: 560, edges: true,
+    box: { default: [150, 56], hpc: [136, 70] },
+    pos: { cloud: [85, 35], adas: [85, 105], cluster: [85, 175], zcs: [85, 245], door: [85, 315],
+           s32k: [85, 385], lin: [85, 455], zca: [85, 525], hpc: [288, 280] },
+    label: {},
   },
 ];
+
+const boxOf = (L: Layout, id: string) => L.box[id] ?? L.box.default;
+function ends(L: Layout, l: Link): [number, number, number, number] {
+  const from = l.from ?? 'hpc';
+  const [x1, y1] = L.pos[from], [x2, y2] = L.pos[l.to];
+  if (!L.edges || from !== 'hpc') return [x1, y1, x2, y2];
+  return [x1 - boxOf(L, 'hpc')[0] / 2, y1, x2 + boxOf(L, l.to)[0] / 2, y2];
+}
 ---
 <figure class="topology not-content">
   {layouts.map((L) => (
-    <svg class={`topo topo--${L.cls}`} viewBox={`0 0 ${L.w} ${L.h}`} role="img" aria-label="Open SDV Bench network topology: a central HPC (Raspberry Pi 5) connects over IP to OpenSDV.Cloud, over Ethernet to the Jetson Orin ADAS domain and the Arduino sensor zone controller, and over CAN to the STM32 body zone controller.">
+    <svg class={`topo topo--${L.cls}`} viewBox={`0 0 ${L.w} ${L.h}`} role="img" aria-label="Open SDV Bench network topology: a central HPC (Raspberry Pi 5) connects over IP to OpenSDV.Cloud, over Ethernet to the Jetson Orin ADAS domain and the Arduino sensor zone controller, over CAN to the STM32 front body zone controller and the door module, over CAN FD to the S32K344 rear body zone controller, which has a LIN smart node below it, and to the instrument cluster over a medium still open.">
       {links.map((l) => {
-        const [x1, y1] = L.pos.hpc, [x2, y2] = L.pos[l.to], [lx, ly, anchor] = L.label[l.to];
+        const [x1, y1, x2, y2] = ends(L, l), lp = L.label[l.to];
         return (
           <g class={`link link--${l.kind}`}>
             <line x1={x1} y1={y1} x2={x2} y2={y2} />
-            <text x={lx} y={ly} text-anchor={anchor}>{l.label}</text>
+            {lp && <text x={lp[0]} y={lp[1]} text-anchor={lp[2]}>{l.label}</text>}
           </g>
         );
       })}
       {nodes.map((n) => {
-        const [x, y] = L.pos[n.id], [bw, bh] = L.box;
+        const [x, y] = L.pos[n.id], [bw, bh] = boxOf(L, n.id);
         return (
-          <g class={`node ${n.hub ? 'node--hub' : ''}`}>
+          <g class={`node ${n.hub ? 'node--hub' : ''} ${n.focus ? 'node--focus' : ''}`}>
             <rect x={x - bw / 2} y={y - bh / 2} width={bw} height={bh} rx="10" />
             <text class="node__title" x={x} y={y - 4} text-anchor="middle">{n.title}</text>
             <text class="node__sub" x={x} y={y + 15} text-anchor="middle">{n.sub}</text>
@@ -58,16 +85,20 @@ const layouts = [
     </svg>
   ))}
   <figcaption>
-    <span class="key key--can">CAN</span> deterministic signals ·
+    <span class="key key--can">CAN / CAN FD</span> deterministic signals ·
+    <span class="key key--lin">LIN</span> smart nodes ·
     <span class="key key--eth">Ethernet</span> services and bulk data ·
-    <span class="key key--ip">IP</span> cloud · Decision: <a href={`${import.meta.env.BASE_URL}adr/0003-bench-network-topology/`}>ADR 0003</a>
+    <span class="key key--ip">IP</span> cloud ·
+    <span class="key key--open">dashed grey</span> medium open ·
+    Decisions: <a href={`${import.meta.env.BASE_URL}adr/0003-bench-network-topology/`}>ADR 0003</a>,
+    <a href={`${import.meta.env.BASE_URL}adr/0008-extended-bench-topology/`}>ADR 0008</a>
   </figcaption>
 </figure>
 
 <style>
   .topology { margin: 1.5rem 0; }
   .topo { width: 100%; height: auto; font-family: var(--sl-font); }
-  .topo--wide { display: block; max-width: 48rem; margin-inline: auto; }
+  .topo--wide { display: block; max-width: 52rem; margin-inline: auto; }
   .topo--narrow { display: none; }
   @media (max-width: 40rem) {
     .topo--wide { display: none; }
@@ -76,15 +107,20 @@ const layouts = [
   .link line { stroke-width: 3; }
   .link text { font-size: 13px; fill: var(--sl-color-gray-2); }
   .link--can line { stroke: var(--topo-can); }
+  .link--canfd line { stroke: var(--topo-can); stroke-width: 5; }
+  .link--lin line { stroke: var(--topo-can); stroke-dasharray: 2 5; }
   .link--eth line { stroke: var(--topo-eth); }
   .link--ip line { stroke: var(--topo-ip); stroke-dasharray: 7 6; }
+  .link--open line { stroke: var(--sl-color-gray-4); stroke-dasharray: 5 5; }
   .node rect { fill: var(--sl-color-bg-nav); stroke: var(--sl-color-gray-4); stroke-width: 1.5; }
   .node--hub rect { stroke: var(--sl-color-accent); stroke-width: 2.5; }
+  .node--focus rect { stroke: var(--topo-can); stroke-width: 2.5; }
   .node__title { font-size: 15px; font-weight: 700; fill: var(--sl-color-white); }
   .node__sub { font-size: 12px; fill: var(--sl-color-gray-3); }
   figcaption { font-size: var(--sl-text-sm); color: var(--sl-color-gray-3); text-align: center; margin-top: 0.5rem; }
   .key { font-weight: 600; }
-  .key--can { color: var(--topo-can); }
+  .key--can, .key--lin { color: var(--topo-can); }
   .key--eth { color: var(--topo-eth); }
   .key--ip { color: var(--topo-ip); }
+  .key--open { color: var(--sl-color-gray-3); }
 </style>

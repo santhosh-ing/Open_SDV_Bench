@@ -72,3 +72,30 @@ The operator can switch the vehicle off, on and into an update mode, as with an 
 RATIONALE: >>>
 Vehicle functions behave differently depending on the vehicle state, and software updates need a safe state to be applied in (ADR 0006).
 <<<
+
+[REQUIREMENT]
+UID: STK-007
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Demonstration
+RELEVANCE: Security
+TITLE: Enter and start the vehicle with a key
+STATEMENT: >>>
+Only a person with a valid key can unlock the vehicle and switch it on.
+<<<
+RATIONALE: >>>
+Access control is part of every production vehicle; on the bench it is shown by the door / digital-key module (ADR 0008).
+<<<
+
+[REQUIREMENT]
+UID: STK-008
+STATUS: Draft
+KIND: Functional
+VERIFICATION: Demonstration
+TITLE: Know the vehicle status at a glance
+STATEMENT: >>>
+The driver can see the indicator and hazard status, the vehicle state, update progress and active warnings without a diagnostic tool.
+<<<
+RATIONALE: >>>
+Shown on the bench by the instrument cluster (ADR 0008).
+<<<

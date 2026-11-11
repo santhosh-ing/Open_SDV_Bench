@@ -2,6 +2,13 @@
 
 Short, dated entries: what was done, what was learned, what's next. Newest at the top.
 
+## 2026-11-11
+
+- Decided to put the electronica boards into the main topology instead of a separate target picture: **ADR 0008** extends ADR 0003 with ZC-S32K (rear body zone, CAN FD), LIN-MCXA (LIN node below it), the Riverdi instrument cluster and ZC-Door (NFC key + door lock on the body CAN). No function moves; ADR 0005/0006 unchanged.
+- Network view, draw.io diagram, deployment view, README and website topology redrawn. Target-topology diagram removed.
+- Requirements: new STK-007 (key), STK-008 (status at a glance), SYS-LIGHT-005 (front and rear in phase), SYS-ACC-001/002, SYS-HMI-001/002; new areas ACC and HMI; nodes and component files listed. All Draft, no milestone.
+- **Next:** unchanged, spec 004 on the ZC-STM32. Open points of ADR 0008 are decided when each node's milestone starts.
+
 ## 2026-11-10
 
 - electronica Munich, edge lab LIVE! workshops: FRDM Automotive (NXP FRDM-A-S32K344) and LVGL on Riverdi's 5″ STM32U5 display. Also collected an NXP FRDM-MCXA156, an ST debug probe and two Renesas FPB-RA2E3 kits with PTX105R NFC reader, NFC cards and SG90 servo.
