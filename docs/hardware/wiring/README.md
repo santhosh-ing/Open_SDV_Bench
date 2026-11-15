@@ -26,6 +26,17 @@ Wire with the board unpowered. Five female-female jumper wires.
 
 The pin names are printed on the board next to headers P1 and P2. The wire colours are a suggestion; any colours work.
 
-VRx and VRy are crossed on purpose: as the module is mounted, left/right moves the VRy output. This follows the first readings on the bench (2026-11-01) and is confirmed once `g_joy_raw_x` shows about 2048 at rest, below 1024 at one end and above 3072 at the other.
+VRx and VRy are crossed on purpose: as the module is mounted, left/right moves the VRy output.
+
+Confirmed on the bench (2026-11-15, debugger WATCH):
+
+| Joystick position | `g_joy_raw_x` | `g_joy_button_raw` |
+|---|---|---|
+| At rest | 2087 | false |
+| Fully left | 4095 | false |
+| Fully right | 6 | false |
+| Pushed down in the centre | – | true |
+
+Left is the high end of the axis.
 
 Next harness: the CAN bus between STM32, Arduinos and the Raspberry Pi, once transceivers are on the bench.

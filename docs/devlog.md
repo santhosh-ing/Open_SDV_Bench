@@ -5,7 +5,8 @@ Short, dated entries: what was done, what was learned, what's next. Newest at th
 ## 2026-11-15
 
 - Joystick wiring corrected on paper: VRy now goes to PA1 (left/right) and VRx to PA2 (reserved), because the module's axes are rotated as mounted. Quick-reference pin table added to `docs/hardware/wiring/README.md`.
-- **Next:** rewire, read `g_joy_raw_x` at rest / left / right in the debugger, then continue spec 004.
+- Rewired and confirmed in the debugger: `g_joy_raw_x` = 2087 at rest, 4095 fully left, 6 fully right; `g_joy_button_raw` is true only while the stick is pushed down. Left is the high end.
+- **Next:** `/speckit-specify` for spec 004, then `joystick_dir` and `indication` with their host tests.
 
 ## 2026-11-11
 
