@@ -2,6 +2,11 @@
 
 Short, dated entries: what was done, what was learned, what's next. Newest at the top.
 
+## 2026-11-15
+
+- Joystick wiring corrected on paper: VRy now goes to PA1 (left/right) and VRx to PA2 (reserved), because the module's axes are rotated as mounted. Quick-reference pin table added to `docs/hardware/wiring/README.md`.
+- **Next:** rewire, read `g_joy_raw_x` at rest / left / right in the debugger, then continue spec 004.
+
 ## 2026-11-11
 
 - Decided to put the electronica boards into the main topology instead of a separate target picture: **ADR 0008** extends ADR 0003 with ZC-S32K (rear body zone, CAN FD), LIN-MCXA (LIN node below it), the Riverdi instrument cluster and ZC-Door (NFC key + door lock on the body CAN). No function moves; ADR 0005/0006 unchanged.
