@@ -2,13 +2,17 @@
 # Render: wireviz joystick.yml
 # Pins checked against the STM32F407G-DISC1 schematic (MB997): PA1, PA2 and PE7
 # are not used by on-board audio, motion sensor, USB or LEDs.
+#
+# Axis note (2026-11-15): as the module is mounted on the bench, moving the
+# stick left/right changes the pin labelled VRy, not VRx. So VRy goes to PA1
+# (left/right, used by spec 004) and VRx goes to PA2 (reserved).
 
 connectors:
   DISC1:
     type: STM32F407G-DISC1 header
     subtype: P1 / P2
     pinlabels: [GND, 3V, PA1, PA2, PE7]
-    notes: PA1 = ADC1_IN1 (X axis), PA2 = ADC1_IN2 (reserved), PE7 = GPIO input with internal pull-up
+    notes: PA1 = ADC1_IN1 (left/right axis), PA2 = ADC1_IN2 (reserved), PE7 = GPIO input with internal pull-up
   JOY:
     type: KY-023 analogue joystick module
     pinlabels: [GND, +5V, VRx, VRy, SW]
@@ -25,4 +29,4 @@ connections:
   -
     - DISC1: [1-5]
     - W1: [1-5]
-    - JOY: [1-5]
+    - JOY: [1, 2, 4, 3, 5]
