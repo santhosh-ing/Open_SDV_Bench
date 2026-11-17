@@ -4,7 +4,7 @@ Base: `https://santhosh-ing.github.io/Open_SDV_Bench`. These URLs are the websit
 
 | Route | Source |
 |---|---|
-| `/` | `site/src/content/docs/index.mdx` (landing) |
+| `/` | `site/public/index.html` (single-file landing page, replaces the Starlight splash) |
 | `/docs/` | `docs/README.md` |
 | `/architecture/` | `docs/architecture/README.md` |
 | `/architecture/{logical,software,network,deployment}/` | `docs/architecture/<view>/README.md` (+ `*.mmd` embedded) |

@@ -136,7 +136,8 @@ function writePage(outFile, { title, description, editPath, body }) {
 
 function main() {
   fs.rmSync(ASSET_DIR, { recursive: true, force: true });
-  // Clean previously generated pages, keep the hand-written landing page.
+  // Clean previously generated pages. The landing page is public/index.html, not a Starlight page.
+  fs.mkdirSync(OUT_DIR, { recursive: true });
   for (const entry of fs.readdirSync(OUT_DIR)) {
     if (entry === 'index.mdx') continue;
     fs.rmSync(path.join(OUT_DIR, entry), { recursive: true, force: true });
