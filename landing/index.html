@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open SDV Bench</title>
+<meta name="description" content="Reference bench for a zonal, service-oriented vehicle E/E architecture based on open-source Eclipse projects.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: dark engineering console with orange accent over a live particle network that reacts to the cursor.
+   Sequence: hero, key figures, architecture, hardware, principles, decisions, governance, layered stack, repository. */
+:root {
+  --bg: #0b0c0e;
+  --panel: #14161ae8;
+  --panel-solid: #14161a;
+  --line: #262a31;
+  --line2: #3a3f48;
+  --text: #e9e7e2;
+  --muted: #8d939c;
+  --accent: #ff6a1a;
+  --accent-dim: #ff6a1a22;
+  --focus: #3ddc97;
+  --eth: #4da3ff;
+  --can: #f0a53a;
+  --cloud: #9a8cff;
+  --warn: #ff5d5d;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+#bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; display: block; }
+header.nav, main, footer { position: relative; z-index: 1; }
+.wrap { width: min(1180px, 100% - 40px); margin-inline: auto; }
+h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.02em; margin: 0; text-wrap: balance; line-height: 1.08; }
+h2 { font-size: clamp(32px, 4.6vw, 52px); }
+h3 { font-size: 21px; letter-spacing: -0.01em; line-height: 1.25; }
+h4 { font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-bottom: 12px; }
+p { margin: 0; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 14px; }
+.lede { color: var(--muted); max-width: 68ch; margin-top: 18px; }
+section { padding: 96px 0; border-top: 1px solid var(--line); }
+
+/* nav */
+header.nav { position: sticky; top: 0; z-index: 20; background: #0b0c0ecc; backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
+.brand { font-weight: 600; font-size: 18px; letter-spacing: -0.01em; text-decoration: none; white-space: nowrap; display: flex; align-items: center; gap: 10px; }
+.brand .mk { width: 24px; height: 24px; border: 1.5px solid var(--accent); color: var(--accent); display: grid; place-items: center; font-family: var(--font-mono); font-size: 9px; }
+.nav ul { display: flex; gap: 24px; list-style: none; margin: 0; padding: 0; font-size: 14px; }
+.nav ul a { text-decoration: none; color: var(--muted); }
+.nav ul a:hover { color: var(--text); }
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px; font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; border: 1px solid var(--line2); background: #0b0c0eaa; color: var(--text); transition: border-color .2s, background .2s; border-radius: 4px; }
+.btn:hover { border-color: var(--text); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #140700; font-weight: 500; }
+.btn.primary:hover { background: #ff813b; border-color: #ff813b; }
+.nav .btn { padding: 9px 16px; }
+
+/* hero */
+.hero { border-top: 0; padding: 0; }
+.hero .wrap { padding: 128px 0 96px; }
+.hero h1 { font-size: clamp(52px, 10vw, 124px); letter-spacing: -0.04em; line-height: .98; }
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero .tag { margin-top: 28px; max-width: 62ch; font-size: 19px; color: #c9c7c2; }
+.hero .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 36px; }
+.chip { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .06em; color: var(--muted); border: 1px solid var(--line); padding: 5px 10px; border-radius: 3px; background: #0b0c0e99; }
+.status { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); padding: 7px 12px; margin-bottom: 28px; background: #0b0c0eaa; border-radius: 3px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--focus); box-shadow: 0 0 0 4px #3ddc9726; flex: none; }
+
+/* stats */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); background: var(--panel); border-radius: 6px; }
+.stat { padding: 28px 26px; border-left: 1px solid var(--line); }
+.stat:first-child { border-left: 0; }
+.stat strong { display: block; font-size: 46px; line-height: 1; font-weight: 500; letter-spacing: -0.03em; color: var(--accent); font-variant-numeric: tabular-nums; }
+.stat span { display: block; margin-top: 10px; font-size: 14px; color: var(--muted); }
+.statwrap { padding: 0 0 96px; border: 0; }
+
+/* architecture points */
+.points { list-style: none; padding: 0; margin: 28px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 40px; }
+.points li { display: flex; gap: 14px; color: #c9c7c2; font-size: 15.5px; }
+.points li::before { content: "//"; font-family: var(--font-mono); color: var(--accent); flex: none; }
+
+/* diagram */
+.diagram { margin-top: 40px; border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 18px; overflow-x: auto; }
+.diagram svg { display: block; width: 100%; min-width: 820px; height: auto; }
+.diagram text { font-family: var(--font-body); fill: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 10px 26px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 9px; }
+.sw { width: 30px; height: 0; border-top: 2px solid; }
+.sw.eth { border-color: var(--eth); }
+.sw.can { border-color: var(--can); border-top-style: dashed; }
+.sw.lin { border-color: var(--can); border-top-style: dotted; }
+.sw.open { border-color: var(--muted); border-top-style: dashed; }
+.sw.box { width: 14px; height: 14px; border: 1.5px solid var(--focus); background: #3ddc9722; border-radius: 2px; }
+.caption { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline; font-size: 14px; color: #c9c7c2; min-height: 2.6em; }
+.caption b { font-weight: 600; color: var(--text); }
+.caption .bd { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+.caption .cp { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.m { width: 22px; flex: none; border-top: 2px solid; display: inline-block; }
+.m.eth { border-color: var(--eth); } .m.can { border-color: var(--can); border-top-style: dashed; } .m.lin { border-color: var(--can); border-top-style: dotted; } .m.open { border-color: var(--muted); border-top-style: dashed; }
+.hint { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+.nd { cursor: pointer; }
+.nd rect { fill: var(--panel-solid); stroke: var(--line2); stroke-width: 1.5; rx: 6; transition: stroke .2s, fill .2s; }
+.nd.cloud rect { stroke: var(--cloud); fill: #16142b; }
+.nd.hpc rect { stroke: var(--accent); fill: #231409; stroke-width: 2; }
+.nd.focus rect { stroke: var(--focus); fill: #0e1d17; }
+.nd .t { fill: var(--text); font-weight: 600; font-size: 16.5px; }
+.nd .b { fill: var(--muted); font-family: var(--font-mono); font-size: 12.5px; }
+.nd:hover rect { fill: #1b1e24; }
+.nd.hpc:hover rect { fill: #2c190b; }
+.nd.sel rect { stroke-width: 3; }
+.nd.sel { filter: drop-shadow(0 0 10px #ffffff2e); }
+.nd:focus-visible rect { stroke: #fff; stroke-width: 3; }
+.lk { fill: none; stroke-width: 2.4; transition: opacity .25s; }
+.lk.eth { stroke: var(--eth); }
+.lk.can { stroke: var(--can); stroke-dasharray: 8 6; }
+.lk.lin { stroke: var(--can); stroke-dasharray: 2 5; stroke-linecap: round; }
+.lk.open { stroke: var(--muted); stroke-dasharray: 8 6; }
+.lk.can, .lk.open { animation: dash 1.1s linear infinite; }
+.lk.lin { animation: dash 1.4s linear infinite; }
+@keyframes dash { to { stroke-dashoffset: -14; } }
+.lk.dim, .pk.dim, .lb.dim { opacity: .22; }
+.lb rect { fill: var(--bg); stroke: var(--line); stroke-width: 1; rx: 3; }
+.lb text { font-family: var(--font-mono); font-size: 11.5px; fill: #d2d0cb; }
+.pk.eth { fill: var(--eth); } .pk.can, .pk.lin { fill: var(--can); } .pk.open { fill: var(--muted); }
+
+/* cards */
+.grid { display: grid; gap: 16px; margin-top: 44px; }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g4 { grid-template-columns: repeat(4, 1fr); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 26px; display: flex; flex-direction: column; gap: 10px; transition: border-color .2s, transform .2s; }
+.card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.card p { color: var(--muted); font-size: 15px; }
+.idx { font-family: var(--font-mono); font-size: 12px; color: var(--accent); letter-spacing: .1em; }
+.spec { margin: auto 0 0; padding-top: 14px; border-top: 1px solid var(--line); display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: 13.5px; }
+.spec dt { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+.spec dd { margin: 0; }
+.card .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.pill { display: inline-block; font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; padding: 3px 9px; border: 1px solid var(--accent); color: var(--accent); border-radius: 3px; white-space: nowrap; }
+.pill.ok { border-color: var(--focus); color: var(--focus); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 10px; }
+.tag { font-family: var(--font-mono); font-size: 11px; border: 1px solid var(--line2); padding: 2px 8px; border-radius: 3px; color: #c9c7c2; }
+.levels .card h3 { display: flex; align-items: baseline; gap: 12px; }
+.levels .card h3 span { font-family: var(--font-mono); font-size: 13px; color: var(--accent); letter-spacing: .08em; }
+
+/* simulator */
+.sub { margin-top: 72px; padding-top: 48px; border-top: 1px solid var(--line); }
+.sub h3 { font-size: clamp(26px, 3.4vw, 36px); }
+.sim { display: grid; grid-template-columns: 1fr 1.1fr; gap: 16px; margin-top: 36px; }
+.box { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 24px; }
+fieldset { border: 0; margin: 0 0 20px; padding: 0; min-width: 0; }
+fieldset:last-child { margin-bottom: 0; }
+legend { padding: 0; font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.seg { display: inline-flex; border: 1px solid var(--line2); border-radius: 4px; overflow: hidden; flex-wrap: wrap; }
+.seg button { font: 500 13px var(--font-mono); background: transparent; color: var(--muted); border: 0; border-left: 1px solid var(--line2); padding: 9px 15px; cursor: pointer; }
+.seg button:first-child { border-left: 0; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #140700; }
+.seg button:hover:not([aria-pressed="true"]) { color: var(--text); }
+.states { display: flex; flex-wrap: wrap; gap: 8px; }
+.st { font-family: var(--font-mono); font-size: 12px; padding: 8px 12px; border: 1px solid var(--line2); border-radius: 4px; color: var(--muted); transition: all .2s; }
+.st.on { color: #140700; background: var(--accent); border-color: var(--accent); }
+.st.fs.on { background: var(--warn); border-color: var(--warn); color: #1a0505; }
+.counter { display: flex; gap: 6px; margin-top: 6px; }
+.counter i { width: 34px; height: 10px; border: 1px solid var(--line2); border-radius: 2px; background: transparent; transition: background .2s; }
+.counter i.f { background: var(--warn); border-color: var(--warn); }
+.msg { display: flex; align-items: center; gap: 10px; margin: 16px 0 4px; font-family: var(--font-mono); font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+.msg .wire { flex: 1 1 60px; min-width: 60px; height: 0; border-top: 2px dashed var(--can); animation: dash 1.1s linear infinite; }
+.msg .wire.lost { border-color: var(--warn); animation: none; opacity: .6; }
+.lamps { display: flex; gap: 14px; margin-top: 8px; }
+.lamp { width: 54px; height: 54px; border-radius: 50%; border: 2px solid var(--line2); display: grid; place-items: center; font-size: 22px; color: var(--line2); transition: all .15s; }
+.lamp.blink { border-color: var(--can); color: var(--can); background: #f0a53a22; animation: lamp 1s steps(1) infinite; }
+@keyframes lamp { 0%, 49% { opacity: 1; } 50%, 100% { opacity: .25; } }
+.readout { margin-top: 20px; font-size: 14.5px; color: #c9c7c2; min-height: 3.2em; }
+.out-row { margin-top: 22px; }
+.note { font-size: 13.5px; color: var(--muted); margin-top: 18px; max-width: 84ch; }
+
+/* governance */
+.chain { margin-top: 16px; border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 20px 24px; display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; font-family: var(--font-mono); font-size: 13px; }
+.chain i { color: var(--accent); font-style: normal; }
+.chain .lbl { width: 100%; font-size: 11px; letter-spacing: .14em; color: var(--muted); text-transform: uppercase; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; align-items: start; }
+.steps { counter-reset: s; list-style: none; padding: 0; margin: 0; border: 1px solid var(--line); background: var(--panel); border-radius: 6px; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; gap: 6px; padding: 13px 20px; border-top: 1px solid var(--line); font-size: 15px; }
+.steps li:first-child { border-top: 0; }
+.steps li::before { content: counter(s, decimal-leading-zero); font-family: var(--font-mono); font-size: 12px; color: var(--accent); padding-top: 3px; }
+.steps li b { font-weight: 500; }
+.steps li span { color: var(--muted); }
+.vp { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* layered stack */
+.layers { margin-top: 44px; border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 18px; display: grid; gap: 14px; }
+.lg { display: grid; grid-template-columns: 168px 1fr; gap: 10px; align-items: start; }
+.lbl2 { border: 1px solid var(--line); background: #101216; border-radius: 4px; padding: 16px 12px; text-align: center; font-weight: 500; font-size: 14px; color: #c9c7c2; align-self: stretch; display: grid; place-items: center; }
+.rows { display: grid; gap: 8px; }
+.r { display: grid; grid-template-columns: repeat(var(--n, 3), 1fr); gap: 8px; }
+.b { position: relative; border: 1px solid var(--line); border-radius: 4px; padding: 13px 10px; text-align: center; font-weight: 500; font-size: 14px; line-height: 1.3; background: #101216; transition: border-color .35s, background .35s, box-shadow .35s; }
+.b small { display: block; font-weight: 400; font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.35; }
+.b.ecl::before { content: ""; position: absolute; top: 8px; left: 8px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.t-cloud .b { background: #15132a; border-color: #2c2750; }
+.t-tool .b { background: #131419; }
+.t-app .b { background: #1a130d; border-color: #33261a; }
+.t-plat .b { background: #0e1620; border-color: #1c2d42; }
+.t-core .b { background: #0f1c2c; border-color: #2a4468; font-size: 16px; padding: 17px 10px; }
+.t-zone .b { background: #101216; }
+.t-comm .b { background: #181410; border-color: #3a2f1d; }
+.t-hw .b { background: #14111c; border-color: #2a2340; }
+.r.pulse .b { border-color: var(--accent); box-shadow: 0 0 0 1px #ff6a1a55, 0 0 18px #ff6a1a22; }
+.b:hover { border-color: var(--accent); }
+.layers-legend { display: flex; flex-wrap: wrap; gap: 8px 24px; font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); padding-top: 6px; }
+.layers-legend i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 8px; }
+
+/* open points, rules, notes, references */
+.otbl { margin-top: 36px; border: 1px solid var(--line); background: var(--panel); border-radius: 6px; overflow-x: auto; }
+.otbl table { border-collapse: collapse; width: 100%; min-width: 680px; font-size: 14.5px; }
+.otbl th, .otbl td { text-align: left; padding: 12px 18px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.otbl th { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.otbl tr:last-child td { border-bottom: 0; }
+.otbl td:first-child { font-weight: 500; white-space: nowrap; }
+.otbl td:last-child { color: var(--muted); font-family: var(--font-mono); font-size: 12.5px; white-space: nowrap; }
+.rules { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; font-size: 15px; color: #c9c7c2; }
+.rules li { display: flex; gap: 12px; }
+.rules li::before { content: "//"; font-family: var(--font-mono); color: var(--accent); flex: none; }
+.dnotes { margin-top: 22px; display: grid; gap: 10px; }
+.dn { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 16px 20px; font-size: 14.5px; color: #c9c7c2; }
+.dn b { font-weight: 500; color: var(--text); }
+.refs { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 32px; font-size: 14.5px; }
+.refs a { text-decoration: underline; text-decoration-color: var(--line2); text-underline-offset: 4px; }
+.refs a:hover { text-decoration-color: var(--accent); }
+.refs span { display: block; color: var(--muted); font-size: 13px; }
+.ghead { margin-top: 56px; }
+
+/* repo */
+.term { margin-top: 40px; border: 1px solid var(--line); background: #0e1013; border-radius: 6px; font-family: var(--font-mono); font-size: 14px; }
+.term header { display: flex; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--line); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.term header b { color: var(--accent); font-weight: 500; }
+.term .body { padding: 22px 18px; display: grid; gap: 10px; }
+.term .row { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.term .row > span:first-child { color: var(--muted); min-width: 92px; }
+.term a { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 4px; overflow-wrap: anywhere; }
+.cursor { display: inline-block; width: 8px; height: 15px; background: var(--accent); vertical-align: -2px; animation: blink 1.1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+footer { border-top: 1px solid var(--line); padding: 56px 0 40px; font-size: 14px; color: var(--muted); background: #0b0c0ecc; }
+footer .cols { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 32px; }
+footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+footer a { text-decoration: none; }
+footer a:hover { color: var(--text); }
+footer .fine { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12.5px; }
+
+@media (max-width: 1000px) {
+  .g3, .g4 { grid-template-columns: 1fr 1fr; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .stat:nth-child(3) { border-left: 0; }
+  .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .sim, .two, .points, .refs { grid-template-columns: 1fr; }
+  footer .cols { grid-template-columns: 1fr 1fr; }
+  .nav ul { display: none; }
+}
+@media (max-width: 760px) {
+  .lg { grid-template-columns: 1fr; }
+  .lbl2 { padding: 8px 12px; text-align: left; justify-items: start; }
+  .r { grid-template-columns: repeat(2, 1fr); }
+  .r.one { grid-template-columns: 1fr; }
+}
+@media (max-width: 620px) {
+  section { padding: 64px 0; }
+  .hero .wrap { padding: 72px 0 64px; }
+  .statwrap { padding-bottom: 64px; }
+  .g3, .g4 { grid-template-columns: 1fr; }
+  .stat { padding: 22px 18px; }
+  .stat strong { font-size: 36px; }
+  .box { padding: 20px; }
+  .r { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .lk.can, .lk.lin, .lk.open, .msg .wire, .cursor { animation: none; }
+  .lamp.blink { animation: none; }
+  .card, .b { transition: none; }
+}
+
+/* ---- documentation portal ---- */
+.portal { margin-top: 36px; border: 1px solid var(--line2); border-radius: 8px; background: var(--panel); overflow: hidden; }
+.pbar { display: flex; align-items: center; gap: 14px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: #0f1114; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.pbar .dots { display: flex; gap: 6px; } .pbar .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--line2); display: block; }
+.pbar .purl { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .pbar .purl b { color: var(--accent); font-weight: 500; }
+.pgo { color: var(--accent); text-decoration: none; white-space: nowrap; } .pgo:hover { text-decoration: underline; }
+.pbody { display: grid; grid-template-columns: 220px minmax(0,1fr) 190px; min-height: 560px; }
+.pside { border-right: 1px solid var(--line); padding: 16px 12px; display: flex; flex-direction: column; gap: 14px; background: #0e1013; }
+.pside input { width: 100%; background: var(--bg); border: 1px solid var(--line2); color: var(--text); border-radius: 4px; padding: 7px 10px; font: 13px var(--font-body); }
+.pside .grp { display: flex; flex-direction: column; gap: 2px; } .pside .grp span { font: 11px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 0 8px 4px; }
+.pside button { text-align: left; background: none; border: 0; border-left: 2px solid transparent; color: var(--text); font: 14px var(--font-body); padding: 6px 8px; cursor: pointer; border-radius: 0 4px 4px 0; }
+.pside button:hover { background: #ffffff0a; } .pside button[aria-selected="true"] { border-left-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.pmain { padding: 26px 32px 36px; min-width: 0; max-height: 760px; overflow-y: auto; scroll-behavior: smooth; }
+.pmain h2 { font-size: 28px; margin: 0 0 10px; } .pmain h3 { font-size: 18px; margin: 30px 0 10px; padding-top: 6px; color: var(--text); scroll-margin-top: 8px; }
+.pmain p, .pmain li { font-size: 15px; color: #cfcdc7; } .pmain code { font-family: var(--font-mono); font-size: 12.5px; background: #ffffff0f; padding: 1px 5px; border-radius: 3px; }
+.pmain .meta { color: var(--muted); } .pmain .note { color: var(--muted); font-size: 14px; border-left: 2px solid var(--line2); padding-left: 12px; }
+.plinks { display: flex; flex-wrap: wrap; gap: 16px; margin: 0 0 14px; font: 12px var(--font-mono); } .plinks a { color: var(--accent); text-decoration: none; } .plinks a:hover { text-decoration: underline; }
+.dt { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; margin: 10px 0 16px; }
+.dt table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 560px; }
+.dt th { text-align: left; font: 11px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 9px 12px; background: #0f1114; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.dt td { padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; color: #cfcdc7; } .dt tr:last-child td { border-bottom: 0; } .dt tr:hover td { background: #ffffff06; }
+.dt td:first-child { color: var(--text); } .dt .mono, td.mono { font-family: var(--font-mono); color: var(--accent); } .dt a { text-decoration: underline; text-decoration-color: var(--line2); text-underline-offset: 3px; } .dt a:hover { text-decoration-color: var(--accent); }
+.st { display: inline-block; font: 11px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; border: 1px solid; white-space: nowrap; }
+.st.have { color: var(--focus); border-color: var(--focus); } .st.ordered { color: var(--eth); border-color: var(--eth); } .st.needed { color: var(--accent); border-color: var(--accent); } .st.optional { color: var(--muted); border-color: var(--line2); }
+.bul { padding-left: 20px; } .bul li { margin: 6px 0; }
+.steps { list-style: none; counter-reset: s; padding: 0; margin: 12px 0; display: grid; gap: 8px; } .steps li { counter-increment: s; display: grid; grid-template-columns: 30px 1fr; gap: 2px 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; }
+.steps li::before { content: counter(s); grid-row: span 2; font: 13px var(--font-mono); color: var(--accent); align-self: center; text-align: center; } .steps b { color: var(--text); font-weight: 500; } .steps span { color: var(--muted); font-size: 14px; }
+.log { list-style: none; padding: 0; margin: 14px 0; border-left: 1px solid var(--line2); } .log li { display: grid; grid-template-columns: 150px 1fr; gap: 14px; padding: 8px 0 8px 16px; position: relative; } .log li::before { content: ""; position: absolute; left: -4px; top: 17px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); } .log time { font: 12.5px var(--font-mono); color: var(--accent); }
+.ptoc { border-left: 1px solid var(--line); padding: 20px 14px; font-size: 13px; position: relative; } .ptoc > span { font: 11px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.ptoc ul { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px; } .ptoc a { color: var(--muted); text-decoration: none; cursor: pointer; } .ptoc a:hover { color: var(--accent); }
+@media (max-width: 980px) { .pbody { grid-template-columns: 1fr; } .ptoc { display: none; } .pside { flex-direction: row; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid var(--line); } .pside input { flex-basis: 100%; } .pside .grp { flex-direction: row; flex-wrap: wrap; align-items: center; } .pside .grp span { padding: 0 6px 0 0; } .pside button { border-left: 0; border: 1px solid var(--line2); border-radius: 4px; padding: 4px 10px; font-size: 13px; } .pmain { padding: 20px 16px; max-height: none; } .log li { grid-template-columns: 1fr; gap: 2px; } .pbar .pgo { display: none; } }
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="mk">SDV</span>Open SDV Bench</a>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#hardware">Hardware</a></li>
+        <li><a href="#principles">Principles</a></li>
+        <li><a href="#decisions">Decisions</a></li>
+        <li><a href="#governance">AI Governance</a></li>
+        <li><a href="#stack">Software Stack</a></li>
+        <li><a href="#documentation">Documentation</a></li>
+      </ul>
+    </nav>
+    <a class="btn" href="https://github.com/santhosh-ing/Open_SDV_Bench">GitHub</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" aria-label="Introduction">
+    <div class="wrap">
+      <div class="status"><span class="dot"></span>Current focus: ZC01 front body zone, milestone M1</div>
+      <h1>Open <em>SDV</em> Bench</h1>
+      <p class="tag">Reference bench for a zonal, service-oriented vehicle E/E architecture. Open-source Eclipse components run on real embedded hardware and are derived from requirements and a system model.</p>
+      <div class="cta">
+        <a class="btn primary" href="#architecture">Explore architecture</a>
+        <a class="btn" href="https://github.com/santhosh-ing/Open_SDV_Bench">View repository</a>
+      </div>
+      <div class="chip-row" aria-label="Key technologies">
+        <span class="chip">Zonal E/E</span><span class="chip">CAN / CAN FD</span><span class="chip">LIN</span><span class="chip">Ethernet</span><span class="chip">MQTT · gRPC</span><span class="chip">VSS</span><span class="chip">SOVD → UDS</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="statwrap">
+    <div class="wrap">
+      <div class="stats">
+        <div class="stat"><strong>8</strong><span>Bench nodes plus one cloud tier</span></div>
+        <div class="stat"><strong>4</strong><span>Link media: Ethernet, CAN, CAN FD, LIN</span></div>
+        <div class="stat"><strong>7</strong><span>Eclipse projects in the target stack</span></div>
+        <div class="stat"><strong>8</strong><span>System model viewpoints, kept as text</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="architecture">
+    <div class="wrap">
+      <span class="eyebrow">01 · Architecture</span>
+      <h2>Central HPC with zonal controllers</h2>
+      <p class="lede">A central high-performance computer connects the cloud tier, the ADAS compute node, the instrument cluster and the zone controllers. The diagram shows each node with its board and the communication protocol of every link.</p>
+      <ul class="points">
+        <li>The central compute runs the vehicle gateway and owns the vehicle state.</li>
+        <li>Zone controllers keep safety-relevant behaviour local, so it survives a lost bus.</li>
+        <li>CAN, CAN FD, LIN and Ethernet are used where each medium fits.</li>
+        <li>Diagnostics are proven on top of the bench and are not its only purpose.</li>
+      </ul>
+
+      <div class="diagram">
+        <svg id="topo" viewBox="0 0 1140 592" role="group" aria-label="Network topology of the Open SDV Bench"></svg>
+        <div class="legend" aria-label="Legend">
+          <span><i class="sw eth"></i>IP / Ethernet</span>
+          <span><i class="sw can"></i>CAN / CAN FD</span>
+          <span><i class="sw lin"></i>LIN</span>
+          <span><i class="sw open"></i>Medium open</span>
+          <span><i class="sw box"></i>Current focus (milestone M1)</span>
+        </div>
+        <div class="caption" id="caption" aria-live="polite"></div>
+        <p class="hint">Select a node to highlight its links. Moving dots indicate message flow and are illustrative.</p>
+      </div>
+      <p class="note">Topology recorded in ADR 0003 and extended by ADR 0008. Open link media are confirmed by an ADR when their milestone starts.</p>
+    </div>
+  </section>
+
+  <section id="hardware">
+    <div class="wrap">
+      <span class="eyebrow">02 · Hardware</span>
+      <h2>Hardware platforms and roles</h2>
+      <p class="lede">Each node of the topology maps to one board. The choice reflects the role of the node: central compute, perception, zone control, human-machine interface or sensing.</p>
+      <div class="grid g4">
+        <article class="card"><span class="idx">HPC</span><h3>Raspberry Pi 5</h3><p>Vehicle gateway and service platform.</p><dl class="spec"><dt>Role</dt><dd>Central HPC</dd><dt>Link</dt><dd>ETH, CAN, CAN FD</dd></dl></article>
+        <article class="card"><span class="idx">ADAS</span><h3>NVIDIA Jetson Orin</h3><p>Compute node for the perception application.</p><dl class="spec"><dt>Role</dt><dd>ADAS compute</dd><dt>Link</dt><dd>ETH · gRPC</dd></dl></article>
+        <article class="card" style="border-color:var(--focus)"><div class="row"><span class="idx" style="color:var(--focus)">ZC01</span><span class="pill ok">Focus · M1</span></div><h3>STM32F407G-DISC1</h3><p>Front body zone with lighting, indicators and hazard.</p><dl class="spec"><dt>Role</dt><dd>Zone controller</dd><dt>Link</dt><dd>CAN 500 kbit/s</dd></dl></article>
+        <article class="card"><span class="idx">ZC02</span><h3>FRDM-A-S32K344</h3><p>Rear body zone and master of the LIN sub-network.</p><dl class="spec"><dt>Role</dt><dd>Zone controller</dd><dt>Link</dt><dd>CAN FD, LIN</dd></dl></article>
+        <article class="card"><span class="idx">DOOR</span><h3>FPB-RA2E3</h3><p>Digital key with NFC reader and door lock.</p><dl class="spec"><dt>Role</dt><dd>Zone controller</dd><dt>Link</dt><dd>CAN (MCP2515)</dd></dl></article>
+        <article class="card"><span class="idx">LIN</span><h3>FRDM-MCXA156</h3><p>LIN smart node for mirror and ambient light.</p><dl class="spec"><dt>Role</dt><dd>LIN slave</dd><dt>Link</dt><dd>LIN via ZC02</dd></dl></article>
+        <article class="card"><span class="idx">HMI</span><h3>Riverdi 5" · STM32U5</h3><p>Instrument cluster with an LVGL user interface.</p><dl class="spec"><dt>Role</dt><dd>Cluster</dd><dt>Link</dt><dd>CAN FD or ETH (open)</dd></dl></article>
+        <article class="card"><span class="idx">SENSE</span><h3>Arduino + Ethernet shield</h3><p>Sensor zone for speed and distance measurement.</p><dl class="spec"><dt>Role</dt><dd>Sensor zone</dd><dt>Link</dt><dd>ETH · MQTT</dd></dl></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="principles">
+    <div class="wrap">
+      <span class="eyebrow">03 · Design principles</span>
+      <h2>Design principles</h2>
+      <div class="grid g3">
+        <article class="card"><span class="idx">01</span><h3>Zone first</h3><p>Functions that must survive a bus loss run in the zone. The turn indication is allocated fully to ZC01.</p></article>
+        <article class="card"><span class="idx">02</span><h3>Fail-safe</h3><p>If the vehicle state is missing for five cycles, ZC01 enters FAILSAFE. Hazard lights stay available in every state.</p></article>
+        <article class="card"><span class="idx">03</span><h3>Single master</h3><p>The gateway is the only source of the vehicle state. ZC01 has no manual mode switch.</p></article>
+        <article class="card"><span class="idx">04</span><h3>Model-based</h3><p>Eight viewpoints, from context to diagnostics, are kept as text so that they can be reviewed and compared by revision.</p></article>
+        <article class="card"><span class="idx">05</span><h3>Traceable</h3><p>No code without a requirement ID. No interface change without a model update and a decision record.</p></article>
+        <article class="card"><span class="idx">06</span><h3>Update-ready</h3><p>Parameter changes are applied only in the Update state, which prepares the bench for an over-the-air demonstration.</p></article>
+      </div>
+
+      <div class="sub" id="behaviour">
+        <span class="eyebrow">Vehicle state behaviour</span>
+        <h3>Vehicle state and ZC01 failsafe</h3>
+        <p class="lede">The gateway is the single master of the vehicle state: Off, On or Update. ZC01 follows this state. If the state message is missing for five consecutive cycles, ZC01 enters FAILSAFE and keeps the turn indication available locally. The simulation applies the rules of the decision record.</p>
+        <div class="sim">
+          <div class="box">
+            <fieldset><legend>Vehicle state (dashboard → CGW)</legend>
+              <div class="seg" data-k="vs" role="group" aria-label="Vehicle state">
+                <button type="button" id="vs-off" data-v="Off" aria-pressed="false">Off</button><button type="button" id="vs-on" data-v="On" aria-pressed="true">On</button><button type="button" id="vs-upd" data-v="Update" aria-pressed="false">Update</button>
+              </div></fieldset>
+            <fieldset><legend>Vehicle state message (CGW → ZC01)</legend>
+              <div class="seg" data-k="sig" role="group" aria-label="Vehicle state message">
+                <button type="button" id="sig-ok" data-v="ok" aria-pressed="true">Present</button><button type="button" id="sig-lost" data-v="lost" aria-pressed="false">Lost</button>
+              </div></fieldset>
+            <fieldset><legend>Joystick turn request (ZC01)</legend>
+              <div class="seg" data-k="joy" role="group" aria-label="Joystick">
+                <button type="button" id="joy-l" data-v="L" aria-pressed="false">Left</button><button type="button" id="joy-n" data-v="N" aria-pressed="true">Neutral</button><button type="button" id="joy-r" data-v="R" aria-pressed="false">Right</button>
+              </div></fieldset>
+            <fieldset><legend>Hazard input (local on ZC01)</legend>
+              <div class="seg" data-k="hz" role="group" aria-label="Hazard">
+                <button type="button" id="hz-off" data-v="0" aria-pressed="true">Off</button><button type="button" id="hz-on" data-v="1" aria-pressed="false">On</button>
+              </div></fieldset>
+          </div>
+          <div class="box">
+            <h4>ZC01 state machine</h4>
+            <div class="states" id="states">
+              <span class="st" data-s="FOLLOW_OFF">FOLLOW_OFF</span><span class="st" data-s="FOLLOW_ON">FOLLOW_ON</span><span class="st" data-s="FOLLOW_UPDATE">FOLLOW_UPDATE</span><span class="st fs" data-s="FAILSAFE">FAILSAFE</span>
+            </div>
+            <div class="msg"><span>CGW · state <b id="cgwstate" style="color:var(--text);font-weight:500">On</b></span><i class="wire" id="wire"></i><span>ZC01</span></div>
+            <div class="out-row"><h4>Missed state messages</h4><div class="counter" id="counter"><i></i><i></i><i></i><i></i><i></i></div></div>
+            <div class="out-row"><h4>Indicator lamps</h4>
+              <div class="lamps"><div class="lamp" id="lampL" aria-label="Left lamp">◀</div><div class="lamp" id="lampR" aria-label="Right lamp">▶</div></div></div>
+            <p class="readout" id="readout"></p>
+          </div>
+        </div>
+        <p class="note">Rules applied: hazard lights are available in every state, including Off and FAILSAFE, and have priority over the turn indicators. They are not activated automatically on signal loss. Turn indicators are active in On and, locally, in FAILSAFE. Open points in the decision record: behaviour of the indicators in Update, the cycle time of the state message and the exit criterion from FAILSAFE. The simulation returns to the received state as soon as the message is present again.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="decisions">
+    <div class="wrap">
+      <span class="eyebrow">04 · Architecture decisions</span>
+      <h2>Decisions are recorded as ADRs</h2>
+      <p class="lede">Each architectural decision is documented with context, options considered, decision and consequences, and is traced to the affected model views in the logical and physical architecture.</p>
+      <div class="grid g3">
+        <article class="card"><div class="row"><span class="idx">ADR 0005</span><span class="pill">Proposed</span></div><h3>Turn indication allocated to ZC01</h3><p>Acquisition, decision, blink generation and lamp driving run in the zone. ZC01 follows the vehicle state from the CGW and reports the indicator and hazard status to the central compute.</p>
+          <dl class="spec"><dt>Options</dt><dd>Fully in ZC01 (chosen) · central decision in the HPC · split with the blink rhythm in the zone</dd><dt>Gain</dt><dd>Function stays available when the CGW or the bus is lost, no bus-induced blink jitter</dd><dt>Cost</dt><dd>Logic changes need a ZC01 update; parameter storage and an update path are required</dd><dt>Level</dt><dd>L0, architecture split</dd></dl></article>
+        <article class="card"><div class="row"><span class="idx">ADR 0006 · 0007</span><span class="pill">Proposed</span></div><h3>Vehicle state management and failsafe</h3><p>The CGW on the Raspberry Pi 5 is the only master of Off, On and Update. A dashboard sets the state through it. ZC01 has no manual mode switch and enters FAILSAFE after five missed cycles.</p>
+          <dl class="spec"><dt>Options</dt><dd>CGW as only master (chosen) · local override switch on ZC01 (two masters, rejected) · CGW master with local authority in FAILSAFE (not needed)</dd><dt>Gain</dt><dd>One source of truth that is easy to test</dd><dt>Cost</dt><dd>CGW is a single point of failure, accepted because ZC01 has a defined FAILSAFE</dd><dt>Level</dt><dd>L0, modes and safety</dd></dl></article>
+        <article class="card"><div class="row"><span class="idx">ADR 0003 · 0008</span><span class="pill ok">Accepted</span></div><h3>Network topology</h3><p>Central HPC star with CAN and CAN FD body zones, a LIN sub-network, Ethernet services and a cloud tier. Open link media are confirmed when their milestone starts.</p>
+          <dl class="spec"><dt>Links</dt><dd>Ethernet, CAN 500 kbit/s, CAN FD, LIN</dd><dt>Open</dt><dd>Medium to the cluster</dd><dt>Level</dt><dd>L0, architecture split</dd><dt>History</dt><dd>Extended by ADR 0008</dd></dl></article>
+      </div>
+
+      <div class="otbl" aria-label="Open points">
+        <table>
+          <thead><tr><th>Topic</th><th>Open point</th><th>Record</th></tr></thead>
+          <tbody>
+            <tr><td>Joystick fault detection</td><td>An open wire on the X axis cannot be told apart from a full deflection without extra hardware.</td><td>ADR 0005</td></tr>
+            <tr><td>Vehicle state in VSS</td><td>Standard VSS has no ignition-state signal; a custom branch may be needed. Whether other zones receive the state through a different contract.</td><td>ADR 0007</td></tr>
+            <tr><td>Rear indication</td><td>Blink phase in step across ZC01 and ZC02: ZC01 sends its phase, or each zone follows a central request. May revise ADR 0005.</td><td>ADR 0008</td></tr>
+            <tr><td>Cluster link and role</td><td>CAN FD or Ethernet; display only, or also the state-setting dashboard (then an input to the CGW).</td><td>ADR 0008</td></tr>
+            <tr><td>Door link</td><td>Body CAN via MCP2515 or UART to ZC02. Check for an on-chip CAN controller on the RA2E3.</td><td>ADR 0008</td></tr>
+            <tr><td>Key security</td><td>Matching only the card UID is a demo limitation; authenticated cards are a possible later topic.</td><td>ADR 0008</td></tr>
+            <tr><td>LIN node function</td><td>Mirror, ambient light, or a rest-bus and fault-injection node for testing the failsafe.</td><td>ADR 0008</td></tr>
+            <tr><td>Diagnostic transport</td><td>SOVD reaches UDS servers over DoIP. Adaptation to CAN with ISO-TP is needed for ZC01 and ZC02.</td><td>Architecture note</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="governance">
+    <div class="wrap">
+      <span class="eyebrow">05 · AI governance</span>
+      <h2>System ownership stays with the architect</h2>
+      <p class="lede">The system model is the control plane. AI works downstream of it and never upstream. Four decision levels define who decides what. When the level is unclear, the level with more control applies.</p>
+      <div class="grid g4 levels">
+        <article class="card"><h3><span>L0</span>Architect only</h3><p>Feature story, boundaries, requirements, architecture split and safety concept. AI does not propose a solution first.</p></article>
+        <article class="card"><h3><span>L1</span>AI advises</h3><p>Interfaces, technology choices and test strategy. The architect drafts, AI challenges, the architect decides and records an ADR.</p></article>
+        <article class="card"><h3><span>L2</span>AI drafts</h3><p>Core embedded code. Every line is reviewed and can be explained by the architect.</p></article>
+        <article class="card"><h3><span>L3</span>AI executes</h3><p>Boilerplate, build scripts and CI. Review through a diff summary and passing tests on hardware.</p></article>
+      </div>
+      <div class="chain" aria-label="Traceability chain">
+        <span class="lbl">Traceability chain</span>
+        Feature story <i>→</i> Requirement (StrictDoc ID) <i>→</i> Model view <i>→</i> Interface (DBC / VSS / API) <i>→</i> Code <i>→</i> Test <i>→</i> Evidence on hardware
+      </div>
+      <div class="two">
+        <div>
+          <h4 style="margin-top:20px">Working loop per feature slice</h4>
+          <ol class="steps">
+            <li><div><b>Intent</b> <span>Sketch and rough interface, written without AI support.</span></div></li>
+            <li><div><b>Challenge</b> <span>AI identifies gaps, risks and alternatives.</span></div></li>
+            <li><div><b>Decision</b> <span>Recorded as an ADR.</span></div></li>
+            <li><div><b>Model and requirements</b> <span>Affected views and IDs are updated.</span></div></li>
+            <li><div><b>Implementation</b> <span>Small slices with an approved plan.</span></div></li>
+            <li><div><b>Review</b> <span>Diff of about 200 lines or less, then explain-back.</span></div></li>
+            <li><div><b>Verification</b> <span>Expected behaviour is written down before running on hardware.</span></div></li>
+            <li><div><b>Close</b> <span>Commit with IDs and a session log entry.</span></div></li>
+          </ol>
+        </div>
+        <div>
+          <h4 style="margin-top:20px">System model viewpoints</h4>
+          <div class="vp">
+            <span class="chip">Context / operational</span><span class="chip">Requirements</span><span class="chip">Logical architecture</span><span class="chip">SW components</span><span class="chip">Network / communication</span><span class="chip">HW / ECU topology</span><span class="chip">Deployment</span><span class="chip">Diagnostics</span>
+          </div>
+          <p class="note">A milestone is complete only when the affected views are updated. Views are kept as text in the repository.</p>
+        </div>
+      </div>
+      <div class="ghead">
+        <h4>Why the charter exists</h4>
+        <ul class="points" style="margin-top:0;grid-template-columns:1fr">
+          <li><span><b style="font-weight:500">Control.</b> Every architectural decision is made by the architect and written down.</span></li>
+          <li><span><b style="font-weight:500">Learning.</b> AI must extend the architect's capability and not replace it.</span></li>
+          <li><span><b style="font-weight:500">Explainability.</b> For every part of the bench the architect can state what it does, why this design, which alternatives were rejected, how it fails and how it was verified, without AI.</span></li>
+        </ul>
+      </div>
+      <div class="two" style="margin-top:32px">
+        <div><h4>Hard rules for AI</h4>
+          <ul class="rules">
+            <li>AI never changes requirements, model views or interfaces without explicit approval.</li>
+            <li>AI never touches files outside the stated scope of the task.</li>
+            <li>AI states assumptions and open questions instead of silently guessing.</li>
+            <li>Plan before code, small diffs, one concern per change.</li>
+            <li>No new dependency or framework without an ADR.</li>
+            <li>If AI disagrees with the design, it says so. Challenge is wanted, not compliance.</li>
+          </ul></div>
+        <div><h4>Learning safeguards</h4>
+          <ul class="rules">
+            <li><b style="font-weight:500">Learn zone and delegate zone.</b> In the learn zone the architect writes the first version and AI reviews.</li>
+            <li><b style="font-weight:500">Predict before run.</b> Expected behaviour is written down before flashing.</li>
+            <li><b style="font-weight:500">Explain-back.</b> AI code is merged only after the architect explains it in own words.</li>
+            <li><b style="font-weight:500">Tutor mode.</b> AI teaches and asks questions instead of giving the full answer.</li>
+            <li><b style="font-weight:500">Learning log.</b> Three lines per session: learned, unclear, to read next.</li>
+            <li><b style="font-weight:500">Monthly whiteboard check.</b> Topology, signal flow and one diagnostic sequence are drawn from memory.</li>
+          </ul></div>
+      </div>
+      <div class="grid g3" style="margin-top:16px">
+        <article class="card"><span class="idx">Single source of truth</span><h3>The repository</h3><p>The repository is authoritative, not the chat history. Every decision from a discussion lands as an ADR or requirement before implementation starts.</p></article>
+        <article class="card"><span class="idx">Thinking room</span><h3>Claude chat</h3><p>Architecture discussion, trade-offs, learning and review.</p></article>
+        <article class="card"><span class="idx">Workshop</span><h3>Claude Code in VS Code</h3><p>Implementation against approved ADRs and requirements. A CLAUDE.md in the repository carries the hard rules, and both tools read the latest session log at the start.</p></article>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="stack">
+    <div class="wrap">
+      <span class="eyebrow">06 · Software stack</span>
+      <h2>Layered system overview</h2>
+      <p class="lede">The stack spans the whole bench, from engineering tooling and the cloud tier down to the boards. The central HPC hosts the service platform built from Eclipse projects. Zone controllers run focused firmware and connect through four link media.</p>
+
+      <div class="layers" id="layers">
+        <div class="lg t-cloud">
+          <div class="lbl2">Cloud and Tooling</div>
+          <div class="rows">
+            <div class="r" style="--n:3">
+              <div class="b ecl">Eclipse hawkBit<small>OTA update management</small></div>
+              <div class="b ecl">Eclipse Hono / Ditto<small>Connectivity · digital twin</small></div>
+              <div class="b">Remote SOVD client<small>Off-board diagnostics</small></div>
+            </div>
+            <div class="r t-tool" style="--n:3">
+              <div class="b">StrictDoc<small>Requirements</small></div>
+              <div class="b">Capella<small>System model</small></div>
+              <div class="b">VS Code · Claude Code<small>Governed AI assistance</small></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg t-app">
+          <div class="lbl2">Vehicle Functions</div>
+          <div class="rows"><div class="r" style="--n:4">
+            <div class="b">ADAS perception<small>Camera application</small></div>
+            <div class="b">Instrument cluster<small>LVGL · tell-tales, DTCs</small></div>
+            <div class="b">Body functions<small>Lighting · indicators · hazard · door · key</small></div>
+            <div class="b">Sensor zone<small>Speed and distance</small></div>
+          </div></div>
+        </div>
+
+        <div class="lg t-plat">
+          <div class="lbl2">Service Platform<br><span style="color:var(--muted);font-size:12px;font-weight:400">Central HPC</span></div>
+          <div class="rows">
+            <div class="r one t-core" style="--n:1"><div class="b" style="border-color:var(--accent)">Vehicle Service Platform<small>Eclipse projects on the central HPC · Raspberry Pi 5</small></div></div>
+            <div class="r" style="--n:3">
+              <div class="b ecl">Eclipse Ankaios<small>Workload orchestration</small></div>
+              <div class="b ecl">Eclipse Kuksa Databroker<small>VSS signal broker · gRPC</small></div>
+              <div class="b ecl">Kuksa CAN provider<small>DBC ↔ VSS · SocketCAN</small></div>
+            </div>
+            <div class="r" style="--n:3">
+              <div class="b ecl">Eclipse OpenSOVD<small>SOVD → UDS · DoIP</small></div>
+              <div class="b ecl">Eclipse Kanto<small>Cloud connector (Suite Connector)</small></div>
+              <div class="b">CGW<small>Vehicle state manager</small></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg t-zone">
+          <div class="lbl2">Zone Firmware</div>
+          <div class="rows"><div class="r" style="--n:3">
+            <div class="b">UDS diagnostic server<small>ZC01 · ZC02</small></div>
+            <div class="b">Vehicle state follower<small>FOLLOW states · FAILSAFE</small></div>
+            <div class="b">Zone I/O firmware<small>Drivers · LIN master · MQTT client</small></div>
+          </div></div>
+        </div>
+
+        <div class="lg t-comm">
+          <div class="lbl2">Communication</div>
+          <div class="rows"><div class="r" style="--n:5">
+            <div class="b">Ethernet<small>gRPC · MQTT</small></div>
+            <div class="b">CAN<small>500 kbit/s body CAN</small></div>
+            <div class="b">CAN FD<small>Zone uplink</small></div>
+            <div class="b">LIN<small>Sub-network</small></div>
+            <div class="b">IP<small>MQTT · HTTPS to cloud</small></div>
+          </div></div>
+        </div>
+
+        <div class="lg t-hw">
+          <div class="lbl2">Hardware System</div>
+          <div class="rows">
+            <div class="r" style="--n:4">
+              <div class="b">Raspberry Pi 5<small>Central HPC</small></div>
+              <div class="b">NVIDIA Jetson Orin<small>ADAS</small></div>
+              <div class="b">STM32F407G-DISC1<small>ZC01</small></div>
+              <div class="b">FRDM-A-S32K344<small>ZC02</small></div>
+            </div>
+            <div class="r" style="--n:4">
+              <div class="b">FPB-RA2E3<small>Door / key</small></div>
+              <div class="b">FRDM-MCXA156<small>LIN node</small></div>
+              <div class="b">Riverdi 5" · STM32U5<small>Cluster</small></div>
+              <div class="b">Arduino + Ethernet shield<small>Sensor zone</small></div>
+            </div>
+          </div>
+        </div>
+        <div class="layers-legend"><span><i></i>Eclipse project</span><span>Target stack: each component is confirmed by an ADR when its milestone starts.</span></div>
+      </div>
+      <div class="dnotes">
+        <div class="dn"><b>Diagnostic transport.</b> The OpenSOVD Classic Diagnostic Adapter translates SOVD requests to UDS over DoIP (ISO 13400-2). Zone controllers on CAN need a DoIP-to-CAN adaptation with ISO-TP (ISO 15765-2). This is tracked as an open point.</div>
+        <div class="dn"><b>Container management.</b> Eclipse Kanto also provides container management. In this topology Eclipse Ankaios orchestrates the workloads and Kanto provides the cloud connection.</div>
+        <div class="dn"><b>Project families.</b> The stack combines projects of the Eclipse SDV and Eclipse IoT communities. hawkBit, Hono and Ditto form the cloud side; Kuksa, Ankaios and OpenSOVD run in the vehicle.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="documentation">
+    <div class="wrap">
+      <span class="eyebrow">07 · Documentation</span>
+      <h2>Documentation portal</h2>
+      <p class="lede">The project documentation is published as a website built from the repository. This hub mirrors its structure: bench inventory, wiring, guides, architecture views, decision records, requirements and devlog. Select a page in the tree.</p>
+      <div class="portal">
+        <div class="pbar"><span class="dots"><i></i><i></i><i></i></span><span class="purl">santhosh-ing.github.io/Open_SDV_Bench/<b id="purl">hardware/bom/</b></span><a class="pgo" href="https://santhosh-ing.github.io/Open_SDV_Bench/">Open the full docs site</a></div>
+        <div class="pbody">
+          <nav class="pside" role="tablist" aria-label="Documentation pages"><input id="pq" type="search" placeholder="Filter pages" aria-label="Filter pages"><div class="grp"><span>Get started</span><button type="button" data-p="bom" role="tab">Bill of materials</button><button type="button" data-p="wiring" role="tab">Wiring</button><button type="button" data-p="guides" role="tab">Guides</button></div><div class="grp"><span>Architecture</span><button type="button" data-p="arc" role="tab">Overview (arc42)</button><button type="button" data-p="logical" role="tab">Logical view</button><button type="button" data-p="software" role="tab">Software view</button><button type="button" data-p="network" role="tab">Network view</button><button type="button" data-p="deploy" role="tab">Deployment view</button><button type="button" data-p="adr" role="tab">Decision records</button></div><div class="grp"><span>Requirements</span><button type="button" data-p="req" role="tab">Requirements</button></div><div class="grp"><span>Project</span><button type="button" data-p="devlog" role="tab">Devlog</button><button type="button" data-p="index" role="tab">Docs index</button></div></nav>
+          <div class="pmain" id="pmain"><article class="panel" id="p-bom" role="tabpanel" hidden><p class="plinks"><a href="https://santhosh-ing.github.io/Open_SDV_Bench/hardware/bom/">Open on the docs site</a><a href="https://github.com/santhosh-ing/Open_SDV_Bench/blob/main/docs/hardware/bom.md">Source on GitHub</a></p>
+<h2>Bill of materials: bench inventory</h2>
+<p class="meta">Status: <span class="st have">have</span> on the bench · <span class="st ordered">ordered</span> · <span class="st needed">needed</span> to order. Open fields are marked <code>?</code> and are closed in the M0 issue "Hardware inventory".</p>
+<h3>Compute and ECUs</h3>
+<div class="dt "><table><thead><tr><th>Item</th><th>Exact model</th><th>Qty</th><th>Role</th><th>Status</th></tr></thead><tbody><tr><td>STM32 board</td><td>STM32F407G-DISC1 (STM32F407VGT6, on-board ST-LINK)</td><td>1</td><td>Body zone ECU</td><td><span class="st have">have</span></td></tr><tr><td>Raspberry Pi</td><td>Raspberry Pi 5 (RAM: ?)</td><td>1</td><td>Central vehicle computer (HPC)</td><td><span class="st have">have</span></td></tr><tr><td>NVIDIA Jetson</td><td>Jetson Orin (variant: ?)</td><td>1</td><td>ADAS domain</td><td><span class="st have">have</span></td></tr><tr><td>Arduino</td><td>? (model)</td><td>2</td><td>Sensor zone controller (ZC-Arduino, Ethernet)</td><td><span class="st have">have</span></td></tr></tbody></table></div>
+<h3>Nodes added by ADR 0008 (electronica 2026)</h3>
+<p class="meta">Collected at electronica Munich on 2026-11-10 and allocated to the topology by ADR 0008. No milestone yet; the current focus stays the ZC-STM32 (M1).</p>
+<div class="dt "><table><thead><tr><th>Item</th><th>Exact model</th><th>Qty</th><th>Role</th><th>Status</th></tr></thead><tbody><tr><td>NXP FRDM Automotive board</td><td>FRDM-A-S32K344 (S32K344, Cortex-M7 lockstep, CAN FD, LIN, Ethernet, on-board debugger)</td><td>1</td><td>Rear body zone controller (ZC-S32K, ZC02), CAN FD, LIN master</td><td><span class="st have">have</span></td></tr><tr><td>NXP FRDM board</td><td>FRDM-MCXA156 (MCX A156, Cortex-M33 96 MHz, on-board MCU-Link)</td><td>1</td><td>LIN smart node (LIN-MCXA) below ZC-S32K</td><td><span class="st have">have</span></td></tr><tr><td>Riverdi STM32 Embedded Display</td><td>5″ 800×480, STM32U599/U5A9 (exact Riverdi part no.: ?)</td><td>1</td><td>Instrument cluster (Cluster), LVGL</td><td><span class="st have">have</span></td></tr><tr><td>ST debug probe</td><td>ST-LINK (exact model: ?)</td><td>1</td><td>SWD debugger for the Riverdi display</td><td><span class="st have">have</span></td></tr><tr><td>Renesas Fast Prototyping Board</td><td>FPB-RA2E3 (RA2E3, Cortex-M23 48 MHz; confirm on silkscreen)</td><td>2</td><td>Door / digital-key module (ZC-Door); second kit = development and spare unit</td><td><span class="st have">have</span></td></tr><tr><td>NFC reader</td><td>Renesas PTX105R Pmod board, with NFC cards</td><td>2</td><td>NFC key reader of ZC-Door</td><td><span class="st have">have</span></td></tr><tr><td>Servo motor</td><td>SG90</td><td>2</td><td>Door lock actuator of ZC-Door</td><td><span class="st have">have</span></td></tr></tbody></table></div>
+<h3>Actuators, I/O and wiring</h3>
+<div class="dt "><table><thead><tr><th>Item</th><th>Exact model</th><th>Qty</th><th>Role</th><th>Status</th></tr></thead><tbody><tr><td>LEDs</td><td>?</td><td>?</td><td>External lamps (later)</td><td><span class="st have">have</span></td></tr><tr><td>Servo motors</td><td>?</td><td>?</td><td>Mirror fold</td><td><span class="st have">have</span></td></tr><tr><td>Jumper wires</td><td>?</td><td>–</td><td>Bench wiring</td><td><span class="st have">have</span></td></tr><tr><td>Joystick</td><td>KY-023-type 2-axis analogue module with push button</td><td>1</td><td>Turn-signal stalk (X axis) and hazard switch (push), ZC-STM32 (ADR 0005). Wiring: wiring/joystick.yml</td><td><span class="st have">have</span></td></tr></tbody></table></div>
+<h3>To order: CAN bus and power</h3>
+<div class="dt "><table><thead><tr><th>Item</th><th>Suggested model</th><th>Qty</th><th>Role</th><th>Status</th></tr></thead><tbody><tr><td>CAN transceiver 3.3 V</td><td>SN65HVD230 module</td><td>1–2</td><td>STM32 to CAN bus</td><td><span class="st needed">needed</span></td></tr><tr><td>CAN controller + transceiver</td><td>MCP2515 module</td><td>2</td><td>Arduino to CAN bus (not needed since ADR 0003; Arduino uses Ethernet). Planned body-CAN link of ZC-Door (ADR 0008; classic CAN only, not for the CAN FD bus)</td><td><span class="st have">have (8)</span></td></tr><tr><td>CAN interface for the Pi</td><td>2-channel, at least one CAN FD capable (e.g. Waveshare 2-CH CAN FD HAT)</td><td>1</td><td>Pi to the body CAN and the CAN FD bus (SocketCAN), ADR 0008</td><td><span class="st needed">needed</span></td></tr><tr><td>Termination resistors</td><td>120 Ω</td><td>4</td><td>Ends of the body CAN and the CAN FD bus</td><td><span class="st needed">needed</span></td></tr><tr><td>LIN transceiver</td><td>e.g. TJA1021 / MCP2003 module (check the FRDM board manuals first)</td><td>2</td><td>ZC-S32K and LIN-MCXA to the LIN bus, ADR 0008</td><td><span class="st needed">needed</span></td></tr><tr><td>12 V supply</td><td>–</td><td>1</td><td>LIN bus supply</td><td><span class="st needed">needed</span></td></tr><tr><td>Twisted pair wire</td><td>–</td><td>–</td><td>CAN_H / CAN_L</td><td><span class="st needed">needed</span></td></tr><tr><td>5 V supply</td><td>≥ 2 A</td><td>1</td><td>Servos (separate from logic boards)</td><td><span class="st needed">needed</span></td></tr></tbody></table></div>
+<h3>To order: Ethernet (ADR 0003)</h3>
+<div class="dt "><table><thead><tr><th>Item</th><th>Suggested model</th><th>Qty</th><th>Role</th><th>Status</th></tr></thead><tbody><tr><td>Ethernet shield</td><td>W5500-based (depends on Arduino model)</td><td>1</td><td>ZC-Arduino to Ethernet</td><td><span class="st needed">needed</span></td></tr><tr><td>Ethernet switch</td><td>5-port unmanaged, 100 Mbit or faster</td><td>1</td><td>Pi, Jetson, Arduino (only if the cloud uplink does not use the Pi&#x27;s Wi-Fi)</td><td><span class="st optional">optional</span></td></tr><tr><td>Ethernet cables</td><td>Cat 5e patch cables</td><td>3–4</td><td>Bench Ethernet</td><td><span class="st needed">needed</span></td></tr></tbody></table></div>
+</article><article class="panel" id="p-wiring" role="tabpanel" hidden><p class="plinks"><a href="https://santhosh-ing.github.io/Open_SDV_Bench/hardware/wiring/">Open on the docs site</a><a href="https://github.com/santhosh-ing/Open_SDV_Bench/blob/main/docs/hardware/wiring/README.md">Source on GitHub</a></p>
+<h2>Wiring</h2>
+<p class="meta">Wiring harness diagrams as code with WireViz: one YAML file per harness, rendered to a diagram and a bill of materials.</p>
+<h3>Harnesses</h3>
+<div class="dt "><table><thead><tr><th>File</th><th>What</th><th>Status</th></tr></thead><tbody><tr><td>joystick.yml</td><td>KY-023 joystick → STM32F407G-DISC1 (3V, GND, PA1, PA2, PE7)</td><td>on the bench</td></tr></tbody></table></div>
+<h3>Joystick connection: quick reference</h3>
+<p class="meta">Wire with the board unpowered. Five female-female jumper wires.</p>
+<div class="dt "><table><thead><tr><th>Wire</th><th>Joystick pin (KY-023)</th><th>STM32F407G-DISC1 pin</th><th>Purpose</th></tr></thead><tbody><tr><td>black</td><td>GND</td><td>GND</td><td>Ground</td></tr><tr><td>red</td><td>+5V</td><td>3V (not 5V)</td><td>Supply. The module pin is labelled +5V, but it must get 3 V: the ADC accepts at most 3.3 V.</td></tr><tr><td>blue</td><td>VRy</td><td>PA1</td><td>Left/right axis (ADC1_IN1), used for turn indication</td></tr><tr><td>violet</td><td>VRx</td><td>PA2</td><td>Other axis (ADC1_IN2), reserved, not read yet</td></tr><tr><td>green</td><td>SW</td><td>PE7</td><td>Push button = hazard switch (internal pull-up, pressed = low)</td></tr></tbody></table></div>
+<p class="note">VRx and VRy are crossed on purpose: as the module is mounted, left/right moves the VRy output. Pin names are printed on the board next to headers P1 and P2.</p>
+<h3>Confirmed on the bench (2026-11-15, debugger WATCH)</h3>
+<div class="dt "><table><thead><tr><th>Joystick position</th><th>g_joy_raw_x</th><th>g_joy_button_raw</th></tr></thead><tbody><tr><td>At rest</td><td>2087</td><td>false</td></tr><tr><td>Fully left</td><td>4095</td><td>false</td></tr><tr><td>Fully right</td><td>6</td><td>false</td></tr><tr><td>Pushed down in the centre</td><td>–</td><td>true</td></tr></tbody></table></div>
+<p class="note">Left is the high end of the axis. Next harness: the CAN bus between STM32, Arduinos and the Raspberry Pi, once transceivers are on the bench.</p>
+</article><article class="panel" id="p-guides" role="tabpanel" hidden><p class="plinks"><a href="https://santhosh-ing.github.io/Open_SDV_Bench/guides/">Open on the docs site</a><a href="https://github.com/santhosh-ing/Open_SDV_Bench/blob/main/docs/guides/README.md">Source on GitHub</a></p>
+<h2>Guides</h2>
+<p class="meta">Practical guides for working on the bench. Architecture and decisions live in the architecture views and ADRs; these pages explain how to do things and what happens when you do them.</p>
+<div class="dt "><table><thead><tr><th>Guide</th><th>For</th><th>Contents</th></tr></thead><tbody><tr><td>From code to blinking LED</td><td>Anyone new to embedded development</td><td>Concepts: CubeMX, CMake, compile and link, flashing, boot sequence, glossary</td></tr><tr><td>STM32 setup, build and flash</td><td>Working on ecus/body-zone-stm32</td><td>Tool installation, commands for the everyday loop, troubleshooting</td></tr></tbody></table></div>
+<h3>From code to blinking LED: the pipeline</h3>
+<ol class="steps">
+<li><b>Describe the hardware setup</b><span>STM32CubeMX generates the clock, pin and peripheral initialisation.</span></li>
+<li><b>Write the application code</b><span>Project code lives in <code>app/</code>, separate from generated files.</span></li>
+<li><b>Plan the build</b><span>CMake describes sources, flags and target.</span></li>
+<li><b>Compile and link</b><span>Ninja drives arm-none-eabi-gcc and produces the <code>.elf</code>.</span></li>
+<li><b>Flash it to the chip</b><span>ST-LINK over SWD writes and verifies the image.</span></li>
+<li><b>The chip boots</b><span>Reset vector, start-up code, clock set-up, then <code>main()</code>.</span></li>
+<li><b>Your code runs</b><span><code>app_init()</code> once, <code>app_run()</code> in the main loop.</span></li>
+<li><b>Observe and verify</b><span>Debugger watch, LEDs and later the CAN bus confirm the behaviour.</span></li>
+</ol>
+<h3>STM32 setup, build and flash</h3>
+<p class="meta">Sections: one-time setup, configure, everyday loop (build to <code>build/Debug/body-zone-stm32.elf</code>, flash over SWD, verify, reset) and troubleshooting. Verified 2026-10-11 with <code>gnu-tools-for-stm32</code> 14.3.1: a blink test used 6 116 B flash and 1 584 B RAM, written by STM32CubeProgrammer over ST-LINK.</p>
+</article><article class="panel" id="p-arc" role="tabpanel" hidden><p class="plinks"><a href="https://santhosh-ing.github.io/Open_SDV_Bench/architecture/">Open on the docs site</a><a href="https://github.com/santhosh-ing/Open_SDV_Bench/blob/main/docs/architecture/README.md">Source on GitHub</a></p>
+<h2>Architecture overview (arc42)</h2>
+<p class="meta">Architecture documentation structured along arc42. Diagrams are kept as code next to the text.</p>
+<h3>Views</h3>
+<p class="meta">Inspired by the layers of an E/E architecture tool: requirements → logical → software → network → deployment.</p>
+<div class="dt "><table><thead><tr><th>View</th><th>Folder</th><th>Shows</th><th>Format</th></tr></thead><tbody><tr><td>Logical (function) view</td><td>logical/</td><td>Vehicle functions and information flows, independent of hardware</td><td>PlantUML / Mermaid</td></tr><tr><td>Software view</td><td>software/</td><td>Software components and layers (C4 containers, firmware layers)</td><td>Mermaid / C4-PlantUML</td></tr><tr><td>Network / topology view</td><td>network/</td><td>ECUs, buses, connections, terminations</td><td>draw.io (.drawio.svg)</td></tr><tr><td>Deployment view</td><td>deployment/</td><td>Which function / workload runs on which ECU or computer</td><td>PlantUML / table</td></tr></tbody></table></div>
+<h3>1. Introduction and goals</h3>
+<p>A desktop software-defined-vehicle bench that demonstrates a realistic SDV architecture: a central vehicle computer with Eclipse SDV components (Kuksa Databroker + VSS, Eclipse OpenSOVD, Ankaios), zone controllers on CAN, CAN FD and Ethernet with a LIN sub-bus, an instrument cluster, an ADAS domain, and a cloud backend for OTA and remote diagnostics. Quality goals: traceability, modularity, runnable without hardware (virtual twins).</p>
+<h3>2. Constraints</h3>
+<p>Hobby hardware (STM32F407G-DISC1, Raspberry Pi 5, Arduino, Jetson Orin), open-source software only, CAN classic at 500 kbit/s and 100 Mbit Ethernet.</p>
+<h3>3. Context and scope</h3>
+<p>To be completed (M0 issue "Diagram: system context").</p>
+<h3>4. Solution strategy</h3>
+<p>Contracts first, spec-driven development (Spec Kit), layered firmware (ADR 0001), command/status CAN split (ADR 0002), central HPC star with CAN and Ethernet links and a cloud tier (ADR 0003), virtual twin per ECU.</p>
+<h3>5. Building block view</h3>
+<p>Body zone ECU firmware layers: see the software view and ADR 0001.</p>
+<h3>6.–12. Runtime, deployment, concepts, decisions, quality, risks, glossary</h3>
+<p>Filled in as the milestones progress.</p>
+</article><article class="panel" id="p-logical" role="tabpanel" hidden><p class="plinks"><a href="https://santhosh-ing.github.io/Open_SDV_Bench/architecture/logical/">Open on the docs site</a><a href="https://github.com/santhosh-ing/Open_SDV_Bench/blob/main/docs/architecture/logical/README.md">Source on GitHub</a></p>
+<h2>Logical view</h2>
+<p class="meta">Vehicle functions and the information flows between them. No ECUs, no buses. Flows are named after VSS signals where possible.</p>
+<p>Planned functions: speed sensing, emergency brake detection, hazard activation, indicator control, low beam control, mirror control, fault monitoring, diagnostic access.</p>
+<h3>Turn indication, hazard and vehicle state</h3>
+<p class="meta">Decisions: ADR 0005 (indication local in the body zone), ADR 0006 (vehicle state management). Modelled graphically in Capella (Arcadia logical architecture, diagram LAB_TurnIndication); the Mermaid file is the text version for review in git.</p>
+<div class="dt "><table><thead><tr><th>Function</th><th>Role</th><th>Requirements</th></tr></thead><tbody><tr><td>F2 Manage vehicle state</td><td>CGW (vehicle state manager)</td><td>SYS-VEH-001</td></tr><tr><td>F4 Read joystick, F5 Decode direction request</td><td>ZC01</td><td>FUN-LIGHT-001, FUN-LIGHT-010, FUN-LIGHT-011</td></tr><tr><td>F6 Read hazard switch</td><td>ZC01</td><td>FUN-LIGHT-012</td></tr><tr><td>F7 Supervise vehicle state</td><td>ZC01</td><td>FUN-VEH-001, FUN-SAFE-001</td></tr><tr><td>F8 Arbitrate indication</td><td>ZC01</td><td>FUN-LIGHT-002, FUN-LIGHT-012, FUN-VEH-001</td></tr><tr><td>F9 Generate blink, F10 Drive indicator lamps</td><td>ZC01</td><td>FUN-LIGHT-001, FUN-LIGHT-002</td></tr><tr><td>F11 Report indication status, F12 Display indication status</td><td>ZC01, CGW</td><td>FUN-DIAG-001</td></tr></tbody></table></div>
+</article><article class="panel" id="p-software" role="tabpanel" hidden><p class="plinks"><a href="https://santhosh-ing.github.io/Open_SDV_Bench/architecture/software/">Open on the docs site</a><a href="https://github.com/santhosh-ing/Open_SDV_Bench/blob/main/docs/architecture/software/README.md">Source on GitHub</a></p>
+<h2>Software view</h2>
+<p class="meta">Software components and their layers.</p>
+<div class="dt "><table><thead><tr><th>File</th><th>Shows</th></tr></thead><tbody><tr><td>body-ecu-layers.mmd</td><td>Firmware layers of the body zone ECU (functions → com / diag → bsp → HAL)</td></tr></tbody></table></div>
+<h3>Body zone firmware layers</h3>
+<ol class="steps">
+<li><b>Vehicle network → CAN interface</b><span>On-chip bxCAN with a 3.3 V transceiver.</span></li>
+<li><b>COM layer</b><span>CAN driver wrapper, generated DBC code, cycle times, timeouts, alive counters.</span></li>
+<li><b>Functions layer</b><span>Hazard, indicators, low beam, mirror. Pure logic, no HAL calls.</span></li>
+<li><b>BSP layer</b><span>LEDs, button, servo, over GPIO, PWM and timers. Only BSP and COM call the ST HAL.</span></li>
+<li><b>Diagnostic layer</b><span>UDS server (milestone M3).</span></li>
+</ol>
+<p class="note">Planned: C4 container view of the HPC (Kuksa Databroker, CAN provider, apps, OpenSOVD gateway).</p>
+</article><article class="panel" id="p-network" role="tabpanel" hidden><p class="plinks"><a href="https://santhosh-ing.github.io/Open_SDV_Bench/architecture/network/">Open on the docs site</a><a href="https://github.com/santhosh-ing/Open_SDV_Bench/blob/main/docs/architecture/network/README.md">Source on GitHub</a></p>
+<h2>Network / topology view</h2>
+<p class="meta">Physical view of the bench: which nodes exist, how they are connected and which protocol runs on each link. Decisions: ADR 0003 (star topology) and ADR 0008 (rear zone, LIN node, instrument cluster, door module). The editable draw.io source is <code>network-topology.drawio.svg</code>; the animated diagram above is the interactive version.</p>
+<h3>Topology</h3>
+<p>A <b>central HPC star</b>: the Raspberry Pi 5 is the hub. Every zone controller and domain computer has one link to it, and the cloud connects through it. A zone may own a sub-bus below it (LIN below the rear zone). Each link uses the medium that fits its job:</p>
+<ul class="bul"><li><b>Ethernet / IP</b> where services, containers or larger data are exchanged (cloud, ADAS, sensor zone).</li><li><b>CAN</b> where a small, deterministic, cyclic signal set and classic diagnostics are needed. The HPC drives two buses: the classic body CAN (front body zone, door module) and a CAN FD bus (rear body zone).</li><li><b>LIN</b> for low-cost smart sensors and actuators below a zone controller.</li></ul>
+<h3>Nodes</h3>
+<div class="dt "><table><thead><tr><th>Node</th><th>Hardware</th><th>Role</th><th>Interfaces</th></tr></thead><tbody><tr><td>OpenSDV.Cloud</td><td>Laptop or cloud VM</td><td>OTA update server, digital twin, remote diagnostics client</td><td>IP</td></tr><tr><td>Central HPC</td><td>Raspberry Pi 5</td><td>Vehicle computer: VSS Databroker, vehicle apps, SOVD gateway, orchestration, cloud connector</td><td>Ethernet, Wi-Fi, CAN (via HAT)</td></tr><tr><td>ADAS domain</td><td>NVIDIA Jetson Orin</td><td>Camera perception, publishes detections as VSS signals</td><td>Ethernet</td></tr><tr><td>ZC-STM32 (ZC01)</td><td>STM32F407G-DISC1</td><td>Front body zone controller: lighting, indicators, hazard, fail-safe, UDS server</td><td>CAN (bxCAN + 3.3 V transceiver)</td></tr><tr><td>ZC-Arduino</td><td>Arduino + Ethernet shield</td><td>Sensor zone controller: speed and distance sensing</td><td>Ethernet</td></tr><tr><td>ZC-S32K (ZC02)</td><td>NXP FRDM-A-S32K344</td><td>Rear body zone controller: rear lighting, LIN master, UDS server</td><td>CAN FD, LIN</td></tr><tr><td>LIN-MCXA</td><td>NXP FRDM-MCXA156</td><td>LIN smart node below the rear zone (mirror or ambient light, open)</td><td>LIN (+ transceiver)</td></tr><tr><td>Cluster</td><td>Riverdi 5″ STM32 Embedded Display (STM32U5)</td><td>Instrument cluster (LVGL): tell-tales, vehicle state, update progress, DTCs</td><td>CAN FD or Ethernet (open)</td></tr><tr><td>ZC-Door</td><td>Renesas FPB-RA2E3 + PTX105R NFC + SG90 servo</td><td>Door / digital-key module: NFC key, door lock, key events to the CGW</td><td>Body CAN via MCP2515 (open)</td></tr></tbody></table></div>
+<h3>Links</h3>
+<div class="dt "><table><thead><tr><th>Link</th><th>Medium</th><th>Protocol (planned)</th><th>Carries</th><th>Milestone</th></tr></thead><tbody><tr><td>Cloud ↔ HPC</td><td>IP (Wi-Fi uplink, like a vehicle&#x27;s cellular link)</td><td>MQTT / HTTPS</td><td>Telemetry, OTA packages, remote SOVD</td><td>M8 (proposed)</td></tr><tr><td>HPC ↔ ZC-STM32</td><td>CAN classic, 500 kbit/s, 120 Ω at both ends</td><td>Signals per body.dbc; UDS over ISO-TP</td><td>Light commands and status, diagnostics</td><td>M1 loopback, M2 real bus, M3 UDS</td></tr><tr><td>HPC ↔ ADAS</td><td>Ethernet</td><td>gRPC (Kuksa Databroker API)</td><td>Detected objects as VSS signals</td><td>M6</td></tr><tr><td>HPC ↔ ZC-Arduino</td><td>Ethernet</td><td>MQTT</td><td>Speed and distance signals</td><td>M5</td></tr><tr><td>HPC ↔ ZC-S32K</td><td>CAN FD, second channel of the HPC CAN interface</td><td>New rear-zone DBC; UDS</td><td>Rear lighting, vehicle state, diagnostics</td><td>not planned yet</td></tr><tr><td>ZC-S32K ↔ LIN-MCXA</td><td>LIN, ZC-S32K is master</td><td>LIN schedule (LDF)</td><td>Smart node commands and status</td><td>not planned yet</td></tr><tr><td>HPC ↔ Cluster</td><td>CAN FD or Ethernet (open)</td><td>Cluster input signals (contract open)</td><td>Tell-tales, vehicle state, DTCs</td><td>not planned yet</td></tr><tr><td>HPC ↔ ZC-Door</td><td>Body CAN via MCP2515 (open; alternative UART to ZC-S32K)</td><td>body.dbc extension</td><td>Key events, lock command and status</td><td>not planned yet</td></tr></tbody></table></div>
+<h3>Open points</h3>
+<ul class="bul"><li><b>Arduino model:</b> decides whether an Ethernet shield (e.g. W5500) is needed and how much protocol fits into its RAM.</li><li><b>Ethernet ports:</b> the Pi 5 has one. Either a small unmanaged switch is added, or the cloud link uses the Pi's Wi-Fi (preferred, mirrors the vehicle's cellular uplink).</li><li><b>Protocols per link</b> are planned, not final. Each is confirmed by an ADR when its milestone starts.</li><li><b>ADR 0008 open points:</b> rear indication in step across two zones, cluster link and role, door link, key security, LIN node function.</li><li><b>MCP2515 is classic CAN only:</b> it fits the body CAN, not the CAN FD bus.</li></ul>
+</article><article class="panel" id="p-deploy" role="tabpanel" hidden><p class="plinks"><a href="https://santhosh-ing.github.io/Open_SDV_Bench/architecture/deployment/">Open on the docs site</a><a href="https://github.com/santhosh-ing/Open_SDV_Bench/blob/main/docs/architecture/deployment/README.md">Source on GitHub</a></p>
+<h2>Deployment view</h2>
+<p class="meta">Which function or workload runs on which node. Later, the HPC part of this table becomes Eclipse Ankaios workload manifests (M7). Components marked planned are candidates; each is confirmed by an ADR when its milestone starts.</p>
+<div class="dt "><table><thead><tr><th>Node</th><th>Function / workload</th><th>Technology (planned)</th><th>Milestone</th></tr></thead><tbody><tr><td>ZC-STM32</td><td>Low beam, left/right indicators, hazard; joystick input (tap = comfort blink, hold = indication), joystick push = local hazard (ADR 0005)</td><td>Firmware, app/functions, app/bsp</td><td>M1</td></tr><tr><td>ZC-STM32</td><td>Communication-loss fail-safe, ECU states, following the vehicle state (ADR 0006)</td><td>Firmware, app/functions, app/com</td><td>M1, M2</td></tr><tr><td>ZC-STM32</td><td>UDS diagnostic server (DIDs, DTCs, IO control)</td><td>Firmware, app/diag</td><td>M3</td></tr><tr><td>ZC-STM32</td><td>Mirror fold (servo)</td><td>Firmware, app/functions</td><td>later</td></tr><tr><td>ZC-Arduino</td><td>Speed (potentiometer) and distance sensing</td><td>PlatformIO firmware, MQTT client</td><td>M5</td></tr><tr><td>ZC-S32K</td><td>Rear lighting (in step with the front: open, ADR 0008), LIN master, UDS server, following the vehicle state</td><td>Firmware, S32 Design Studio / RTD</td><td>not planned yet</td></tr><tr><td>ZC-S32K</td><td>Secure boot and signed updates (HSE)</td><td>Firmware</td><td>later</td></tr><tr><td>LIN-MCXA</td><td>LIN smart node: mirror or ambient light (open)</td><td>Firmware, MCUXpresso SDK</td><td>not planned yet</td></tr><tr><td>Cluster</td><td>Instrument cluster: tell-tales, vehicle state, update progress, DTCs</td><td>LVGL on STM32U5</td><td>not planned yet</td></tr><tr><td>ZC-Door</td><td>NFC key reading, door lock (servo), key events to the CGW</td><td>Firmware, Renesas FSP; PTX105R and PWM servo blocks</td><td>not planned yet</td></tr><tr><td>HPC</td><td>Vehicle state manager (CGW role, Off / On / Update) and dashboard (ADR 0006); key events from ZC-Door are an input (ADR 0008)</td><td>VEH_State on CAN (ADR 0007), dashboard app</td><td>M2</td></tr><tr><td>HPC</td><td>VSS Databroker</td><td>Eclipse Kuksa Databroker (container)</td><td>M2</td></tr><tr><td>HPC</td><td>CAN ↔ VSS mapping</td><td>Kuksa CAN provider, interfaces/can/body.dbc</td><td>M2</td></tr><tr><td>HPC</td><td>Vehicle apps: light control, brake assist</td><td>Python apps, Eclipse Velocitas model, Kuksa client</td><td>M2, M5</td></tr><tr><td>HPC</td><td>SOVD gateway and classic adapter (SOVD → UDS)</td><td>Eclipse OpenSOVD</td><td>M4</td></tr><tr><td>HPC</td><td>Workload orchestration and updates</td><td>Eclipse Ankaios</td><td>M7</td></tr><tr><td>HPC</td><td>Cloud connector, OTA client</td><td>Eclipse Kanto</td><td>M8 (proposed)</td></tr><tr><td>ADAS</td><td>Camera perception, publishes detections as VSS</td><td>Container workload, Kuksa client</td><td>M6</td></tr><tr><td>OpenSDV.Cloud</td><td>OTA update server</td><td>Eclipse hawkBit</td><td>M8 (proposed)</td></tr><tr><td>OpenSDV.Cloud</td><td>Device connectivity, digital twin</td><td>Eclipse Hono / Ditto</td><td>M8 (proposed)</td></tr><tr><td>OpenSDV.Cloud</td><td>Remote diagnostics</td><td>SOVD client against the HPC gateway</td><td>M8 (proposed)</td></tr><tr><td>Developer PC / CI</td><td>Virtual twins of the zone controllers</td><td>Python, vcan0, same contracts</td><td>M2</td></tr></tbody></table></div>
+</article><article class="panel" id="p-adr" role="tabpanel" hidden><p class="plinks"><a href="https://santhosh-ing.github.io/Open_SDV_Bench/adr/">Open on the docs site</a><a href="https://github.com/santhosh-ing/Open_SDV_Bench/blob/main/docs/adr/">Source on GitHub</a></p>
+<h2>Decision records</h2>
+<p class="meta">One decision per file: context, decision and consequences. Proposed records are not accepted until their listed conflicts are resolved.</p>
+<div class="dt"><table><thead><tr><th>ADR</th><th>Title</th><th>Status</th><th>Decision</th></tr></thead><tbody><tr><td class="mono">0001</td><td><a href="https://santhosh-ing.github.io/Open_SDV_Bench/adr/0001-use-autosar-inspired-layering/">AUTOSAR-inspired layered application structure</a></td><td><span class="st have">Accepted</span></td><td>BSP, COM, DIAG and FUNCTIONS layers; generated CubeMX files kept apart from custom code.</td></tr><tr><td class="mono">0002</td><td><a href="https://santhosh-ing.github.io/Open_SDV_Bench/adr/0002-body-can-contract-v0-1/">Body CAN contract v0.1 (command/status split)</a></td><td><span class="st have">Accepted</span></td><td>BODY_LightCmd (0x200) and BODY_LightStatus (0x210), 100 ms cycle, alive counter, 500 ms command timeout. Code generated from the DBC.</td></tr><tr><td class="mono">0003</td><td><a href="https://santhosh-ing.github.io/Open_SDV_Bench/adr/0003-bench-network-topology/">Bench network topology</a></td><td><span class="st have">Accepted</span></td><td>Central HPC star: Ethernet for cloud, ADAS and sensor zone, CAN for the body zone. Extended by ADR 0008.</td></tr><tr><td class="mono">0004</td><td><a href="https://santhosh-ing.github.io/Open_SDV_Bench/adr/0004-requirements-management-with-strictdoc/">Requirements management with StrictDoc</a></td><td><span class="st have">Accepted</span></td><td>Requirements as text objects with stable IDs, CI-checked links, traceability matrix and ReqIF export. Sphinx-Needs considered.</td></tr><tr><td class="mono">0005</td><td><a href="https://santhosh-ing.github.io/Open_SDV_Bench/adr/0005-turn-indication-local-in-body-zone/">Turn indication runs locally in the body zone controller</a></td><td><span class="st ordered">Proposed</span></td><td>Joystick, decision, blink and lamps fully in ZC-STM32, gated by the vehicle state. Conflicts resolved 2026-11-01.</td></tr><tr><td class="mono">0006</td><td><a href="https://santhosh-ing.github.io/Open_SDV_Bench/adr/0006-vehicle-state-management/">Vehicle state management by the HPC, and the body zone fail-safe</a></td><td><span class="st ordered">Proposed</span></td><td>CGW is the single master of Off / On / Update. Fail-safe after 5 missed cycles; hazard available in every state.</td></tr><tr><td class="mono">0007</td><td><a href="https://santhosh-ing.github.io/Open_SDV_Bench/adr/0007-body-can-contract-v0-2/">Body CAN contract v0.2 (vehicle state, local indication)</a></td><td><span class="st ordered">Proposed</span></td><td>New VEH_State (0x100); direction requests removed from BODY_LightCmd; VehStateTimeout and VehicleStateApplied reported.</td></tr><tr><td class="mono">0008</td><td><a href="https://santhosh-ing.github.io/Open_SDV_Bench/adr/0008-extended-bench-topology/">Extended bench topology</a></td><td><span class="st have">Accepted</span></td><td>Adds ZC-S32K (CAN FD), LIN-MCXA, Cluster and ZC-Door. CGW stays the single master of vehicle state. Accepted 2026-11-11.</td></tr></tbody></table></div>
+<h3>Open points in the records</h3>
+<div class="dt "><table><thead><tr><th>Record</th><th>Open point</th></tr></thead><tbody><tr><td>ADR 0005</td><td>Joystick fault detection: an open wire on the X axis cannot be told apart from a full deflection without extra hardware.</td></tr><tr><td>ADR 0007</td><td>VSS path for the vehicle state (standard VSS has no ignition-state signal; a custom branch may be needed). Whether other zones receive the vehicle state through a different contract.</td></tr><tr><td>ADR 0008</td><td>Rear indication across two zones (may revise ADR 0005), cluster link and role, door link (body CAN via MCP2515 or UART to ZC-S32K), key security (UID matching is a demo limitation), LIN-MCXA function.</td></tr><tr><td>ADR 0003</td><td>Exact Arduino model; switch or Wi-Fi for the cloud uplink.</td></tr></tbody></table></div>
+</article><article class="panel" id="p-req" role="tabpanel" hidden><p class="plinks"><a href="https://santhosh-ing.github.io/Open_SDV_Bench/requirements-management/">Open on the docs site</a><a href="https://github.com/santhosh-ing/Open_SDV_Bench/blob/main/docs/requirements/README.md">Source on GitHub</a></p>
+<h2>Requirements</h2>
+<p class="meta">Managed as text files with StrictDoc (ADR 0004). Each requirement is an object with a stable ID, attributes and links, versioned in git and checked by CI on every pull request. 50 requirements at the time of this snapshot.</p>
+<h3>Hierarchy</h3>
+<div class="dt "><table><thead><tr><th>File</th><th>Level</th><th>ID scheme</th><th>Verified by</th></tr></thead><tbody><tr><td>00-stakeholder-needs</td><td>Stakeholder needs (8)</td><td>STK-NNN</td><td>Demonstration on the bench</td></tr><tr><td>10-system-requirements</td><td>System, vehicle level (14)</td><td>SYS-&lt;AREA&gt;-NNN</td><td>System tests on the bench</td></tr><tr><td>20-function-requirements</td><td>Logical functions, node-independent (10)</td><td>FUN-&lt;AREA&gt;-NNN</td><td>Integration tests (HPC + virtual twins)</td></tr><tr><td>30-zc-stm32-requirements</td><td>Component: body zone controller (18)</td><td>SW-ZCS-NNN, HW-ZCS-NNN</td><td>Host unit tests, tests on the board</td></tr></tbody></table></div>
+<p class="note">Later component files: 31-hpc, 32-zc-arduino, 33-adas, 34-cloud, and for ADR 0008 nodes 35-zc-s32k, 36-lin-mcxa, 37-cluster, 38-zc-door. Areas: LIGHT, SAFE, DIAG, ARCH, VEH, ACC, HMI.</p>
+<h3>Link rules (tools/req_check.py)</h3>
+<ul class="bul"><li>SYS → parent STK; FUN → parent SYS; SW/HW → parent FUN (constraints may trace directly to SYS).</li><li>Every requirement below STK has at least one parent.</li><li>Allocation to a node happens at component level (ALLOCATED_TO). A function without component children is reported as "not yet refined", which makes open allocation decisions visible.</li></ul>
+<h3>Attributes</h3>
+<div class="dt "><table><thead><tr><th>Field</th><th>Meaning</th></tr></thead><tbody><tr><td>UID</td><td>Stable ID, never reused, never renamed</td></tr><tr><td>STATUS</td><td>Draft → Agreed → Implemented → Verified, or Obsolete</td></tr><tr><td>KIND</td><td>Functional, Non-functional, Constraint</td></tr><tr><td>ALLOCATED_TO</td><td>ZC-STM32, HPC, ZC-Arduino, ADAS, Cloud, ZC-S32K, LIN-MCXA, Cluster, ZC-Door</td></tr><tr><td>VERIFICATION</td><td>Test, Demonstration, Inspection, Analysis</td></tr><tr><td>MILESTONE · RELEVANCE · LEGACY_ID</td><td>Optional: M1 to M8; Safety / Security; former ID of migrated requirements</td></tr></tbody></table></div>
+<h3>Writing a requirement (EARS)</h3>
+<div class="dt "><table><thead><tr><th>Pattern</th><th>Template</th></tr></thead><tbody><tr><td>Ubiquitous</td><td>The &lt;system&gt; shall &lt;response&gt;.</td></tr><tr><td>Event-driven</td><td>When &lt;trigger&gt;, the &lt;system&gt; shall &lt;response&gt;.</td></tr><tr><td>State-driven</td><td>While &lt;state&gt;, the &lt;system&gt; shall &lt;response&gt;.</td></tr><tr><td>Unwanted behaviour</td><td>If &lt;condition&gt;, then the &lt;system&gt; shall &lt;response&gt;.</td></tr></tbody></table></div>
+<h3>Change process</h3>
+<ol class="steps">
+<li><b>Change by pull request only</b><span>Edit the .sdoc files or use the StrictDoc web editor, then open a PR with reason and impact.</span></li>
+<li><b>CI validates</b><span>Syntax, unique IDs and links (StrictDoc) and the project rules (req_check.py).</span></li>
+<li><b>Review suspect links</b><span>If a title or statement changes, CI lists the children as warnings.</span></li>
+<li><b>Never delete</b><span>Set STATUS to Obsolete so old reports and commits stay traceable.</span></li>
+<li><b>Status follows evidence</b><span>Implemented or Verified only with a test carrying <code>@verifies &lt;ID&gt;</code>.</span></li>
+<li><b>Baselines</b><span>Git tags on main, e.g. req-baseline-M1.</span></li>
+</ol>
+<h3>Published report</h3>
+<p>CI builds the StrictDoc HTML export, the traceability matrix and a ReqIF file on every run. On main the website publishes them.</p>
+<p class="plinks"><a href="https://santhosh-ing.github.io/Open_SDV_Bench/requirements/">Requirements report</a><a href="https://santhosh-ing.github.io/Open_SDV_Bench/requirements/traceability.html">Traceability matrix</a></p>
+</article><article class="panel" id="p-devlog" role="tabpanel" hidden><p class="plinks"><a href="https://santhosh-ing.github.io/Open_SDV_Bench/devlog/">Open on the docs site</a><a href="https://github.com/santhosh-ing/Open_SDV_Bench/blob/main/docs/devlog.md">Source on GitHub</a></p>
+<h2>Devlog</h2>
+<p class="meta">Short, dated entries: what was done, what was learned, what is next. Newest first. Condensed here; the full log is on the docs site.</p>
+<ul class="log"><li><time>2026-11-15</time><span>Joystick wiring corrected and confirmed in the debugger: g_joy_raw_x 2087 at rest, 4095 left, 6 right. Quick-reference pin table added. Next: spec 004.</span></li><li><time>2026-11-11</time><span>ADR 0008 puts the electronica boards into the main topology. Network, deployment view, README and topology redrawn; new STK-007/008, SYS-LIGHT-005, SYS-ACC and SYS-HMI requirements as Draft.</span></li><li><time>2026-11-10</time><span>electronica Munich: FRDM Automotive and LVGL workshops; boards added to the BOM as candidates. A board joins the topology only through its own ADR.</span></li><li><time>2026-11-01 (night)</time><span>Spec 001 verified on the board: lamp test, 1 Hz heartbeat, button demo, scheduler timing within tolerance. SW-ZCS-023 Verified.</span></li><li><time>2026-11-01 (evening)</time><span>Joystick wired on paper. Requirements updated for ADR 0005/0006; contract v0.2 proposed (ADR 0007). Working agreement: firmware is written by the maintainer, AI assistants update requirements, ADRs and diagrams only.</span></li><li><time>2026-11-01</time><span>Arcadia model started in Capella 7.0.1. ADR 0005 and ADR 0006 proposed.</span></li><li><time>2026-10-14 (late)</time><span>Constitution ratified (v1.0.0). Spec 001 implemented: 1 ms scheduler, BSP, ECU states, 16 host unit tests, firmware CI job (7.5 KB flash, 1.6 KB RAM).</span></li><li><time>2026-10-14</time><span>Project website built (spec 003): Astro + Starlight, generated from docs/ at build time.</span></li><li><time>2026-10-11</time><span>Body zone firmware builds and flashes from VS Code. Guides added.</span></li><li><time>2026-10-10 (late)</time><span>Requirements moved to a StrictDoc hierarchy (ADR 0004); CI checks, traceability matrix and ReqIF export.</span></li><li><time>2026-10-10 (evening)</time><span>Target architecture agreed: central HPC star with cloud tier (ADR 0003); draw.io network view.</span></li><li><time>2026-10-10</time><span>Repo structure aligned; CAN contract v0.1 agreed (ADR 0002); Spec Kit initialised.</span></li></ul>
+</article><article class="panel" id="p-index" role="tabpanel" hidden><p class="plinks"><a href="https://santhosh-ing.github.io/Open_SDV_Bench/docs/">Open on the docs site</a><a href="https://github.com/santhosh-ing/Open_SDV_Bench/blob/main/docs/README.md">Source on GitHub</a></p>
+<h2>Documentation index</h2>
+<p class="meta">System-level design documentation following the systems-engineering flow: requirements → architecture → decisions.</p>
+<div class="dt "><table><thead><tr><th>Folder / file</th><th>Contents</th></tr></thead><tbody><tr><td>requirements/</td><td>Requirement hierarchy (stakeholder → system → function → component) in StrictDoc</td></tr><tr><td>architecture/</td><td>arc42 overview + views: logical, software, network, deployment</td></tr><tr><td>adr/</td><td>Architecture Decision Records</td></tr><tr><td>hardware/</td><td>Bench inventory (bom.md) and wiring diagrams (wiring/)</td></tr><tr><td>guides/</td><td>How-to guides: firmware workflow explained, STM32 setup, build and flash</td></tr><tr><td>spec-inputs/</td><td>Reviewed inputs for the Spec Kit commands</td></tr><tr><td>devlog.md</td><td>Dated progress log</td></tr></tbody></table></div>
+<h3>Also in the repository</h3>
+<div class="dt "><table><thead><tr><th>Path</th><th>Contents</th></tr></thead><tbody><tr><td>AI_GOVERNANCE.md</td><td>AI governance charter: decision levels L0 to L3, traceability chain, working loop, hard rules</td></tr><tr><td>AGENTS.md · CLAUDE.md</td><td>Single source of rules for AI assistants; CLAUDE.md points to AGENTS.md</td></tr><tr><td>interfaces/</td><td>Contracts: can/*.dbc, vss/, diag/*.yaml</td></tr><tr><td>specs/</td><td>Spec Kit feature folders (spec, plan, tasks)</td></tr><tr><td>tools/</td><td>Helper scripts: gen_can.sh, req_check.py</td></tr></tbody></table></div>
+</article></div>
+          <aside class="ptoc" aria-label="On this page"><span>On this page</span><ul id="ptoc"></ul></aside>
+        </div>
+      </div>
+      <div class="ghead" style="margin-top:48px">
+        <h4>Governance documents</h4>
+        <div class="grid g3" style="margin-top:16px">
+          <article class="card"><span class="idx">AI_GOVERNANCE.md</span><h3>AI governance charter</h3><p>Decision levels L0 to L3, traceability chain, working loop, learning safeguards and hard rules.</p></article>
+          <article class="card"><span class="idx">AGENTS.md</span><h3>Assistant rules</h3><p>Contracts first, traceability, firmware layering, determinism and small hardware-verifiable increments.</p></article>
+          <article class="card"><span class="idx">docs/spec-inputs/</span><h3>Spec Kit inputs</h3><p>Reviewed inputs for constitution, body ECU bring-up, CAN lights, project website and joystick indication.</p></article>
+        </div>
+      </div>
+      <div class="ghead">
+        <h4>Public references</h4>
+        <ul class="refs">
+          <li><a href="https://github.com/eclipse-ankaios/ankaios">Eclipse Ankaios</a><span>Workload and container orchestration for automotive HPC software</span></li>
+          <li><a href="https://github.com/eclipse-kuksa/kuksa-can-provider">Eclipse Kuksa CAN provider</a><span>DBC mapping between SocketCAN and the Kuksa Databroker</span></li>
+          <li><a href="https://projects.eclipse.org/projects/automotive.opensovd/governance">Eclipse OpenSOVD</a><span>Open implementation of SOVD as defined in ISO 17978</span></li>
+          <li><a href="https://github.com/eclipse-opensovd/classic-diagnostic-adapter">OpenSOVD Classic Diagnostic Adapter</a><span>SOVD API for UDS-based ECUs over DoIP</span></li>
+          <li><a href="https://eclipse.dev/kanto/docs/concepts">Eclipse Kanto concepts</a><span>Suite Connector, container management and update manager</span></li>
+          <li><a href="https://sdv-blueprints.eclipse.dev/docs/e2e-demo-blueprint/signal-mapping">Eclipse SDV Blueprints: VSS and CAN signal mapping</a><span>Reference for the Kuksa CAN provider mapping</span></li>
+        </ul>
+        <div class="vp" style="margin-top:24px"><span class="chip">ISO 14229 · UDS</span><span class="chip">ISO 17978 · SOVD</span><span class="chip">ISO 13400-2 · DoIP</span><span class="chip">ISO 15765-2 · ISO-TP</span><span class="chip">ISO 11898 · CAN</span><span class="chip">ISO 17987 · LIN</span><span class="chip">COVESA VSS</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <span class="eyebrow">08 · Repository</span>
+      <h2>Source, requirements and decision records</h2>
+      <p class="lede">Requirements, model views and ADRs are versioned together with the firmware. The repository is the single source of truth.</p>
+      <div class="term">
+        <header><b>SYS://REPO.ACCESS</b><span>Open source</span></header>
+        <div class="body">
+          <div class="row"><span>&gt; repo</span><a href="https://github.com/santhosh-ing/Open_SDV_Bench">github.com/santhosh-ing/Open_SDV_Bench</a></div>
+          <div class="row"><span>&gt; issues</span><a href="https://github.com/santhosh-ing/Open_SDV_Bench/issues">Questions and change requests</a></div>
+          <div class="row"><span>&gt; layout</span><span>docs/adr · docs/architecture · docs/requirements · docs/hardware</span></div>
+          <div class="row"><span>&gt; ready</span><i class="cursor"></i></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div><a class="brand" href="#top"><span class="mk">SDV</span>Open SDV Bench</a><p style="margin-top:12px;max-width:36ch">Reference bench for a zonal vehicle E/E architecture, built in the open.</p></div>
+      <div><h4>Project</h4><ul><li><a href="#architecture">Architecture</a></li><li><a href="#hardware">Hardware</a></li><li><a href="#principles">Principles</a></li></ul></div>
+      <div><h4>Engineering</h4><ul><li><a href="#decisions">Decisions</a></li><li><a href="#governance">AI governance</a></li><li><a href="#stack">Software stack</a></li><li><a href="#documentation">Documentation</a></li></ul></div>
+      <div><h4>Links</h4><ul><li><a href="https://github.com/santhosh-ing/Open_SDV_Bench">GitHub</a></li><li><a href="https://github.com/santhosh-ing/Open_SDV_Bench/issues">Issues</a></li></ul></div>
+    </div>
+    <p class="fine">© 2026 Open SDV Bench. Personal open-source project. Eclipse project names are trademarks of the Eclipse Foundation.</p>
+  </div>
+</footer>
+
+<script>
+/* ---------- 1. Cursor-reactive particle network (fixed background) ---------- */
+(function () {
+  var cv = document.getElementById('bg'), ctx = cv.getContext('2d');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W, H, dpr, pts = [], m = { x: -9999, y: -9999 };
+  var LINK = 120, REACH = 190;
+  function size() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var n = Math.min(130, Math.round(W * H / 13000));
+    while (pts.length < n) pts.push({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .28, vy: (Math.random() - .5) * .28, r: Math.random() * 1.3 + .6 });
+    pts.length = n;
+  }
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    var i, j, a, b, dx, dy, d;
+    for (i = 0; i < pts.length; i++) {
+      a = pts[i];
+      if (!reduce) {
+        a.x += a.vx; a.y += a.vy;
+        if (a.x < 0 || a.x > W) a.vx *= -1;
+        if (a.y < 0 || a.y > H) a.vy *= -1;
+        dx = m.x - a.x; dy = m.y - a.y; d = Math.sqrt(dx * dx + dy * dy);
+        if (d < REACH && d > 1) { a.x += dx / d * .35; a.y += dy / d * .35; }
+      }
+      ctx.fillStyle = 'rgba(225,220,210,.42)';
+      ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, 6.2832); ctx.fill();
+      for (j = i + 1; j < pts.length; j++) {
+        b = pts[j]; dx = a.x - b.x; dy = a.y - b.y; d = Math.sqrt(dx * dx + dy * dy);
+        if (d < LINK) { ctx.strokeStyle = 'rgba(205,200,190,' + (1 - d / LINK) * .15 + ')'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
+      }
+      dx = a.x - m.x; dy = a.y - m.y; d = Math.sqrt(dx * dx + dy * dy);
+      if (d < REACH) { ctx.strokeStyle = 'rgba(255,128,56,' + (1 - d / REACH) * .65 + ')'; ctx.lineWidth = 1.1; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(m.x, m.y); ctx.stroke(); }
+    }
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  function move(x, y) { m.x = x; m.y = y; if (reduce) frame(); }
+  window.addEventListener('pointermove', function (e) { move(e.clientX, e.clientY); }, { passive: true });
+  window.addEventListener('touchmove', function (e) { if (e.touches[0]) move(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+  document.addEventListener('mouseleave', function () { move(-9999, -9999); });
+  window.addEventListener('resize', function () { size(); if (reduce) frame(); });
+  size(); frame();
+})();
+
+/* ---------- 2. Animated topology: nodes, boards, protocols ---------- */
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  var svg = document.getElementById('topo'), cap = document.getElementById('caption');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var NODES = [
+    { id: 'cloud', cls: 'cloud', x: 438, y: 10, w: 260, h: 74, t: 'OpenSDV.Cloud', b: 'Cloud back-end', n: 'OpenSDV.Cloud' },
+    { id: 'hpc', cls: 'hpc', x: 408, y: 150, w: 320, h: 84, t: 'Central HPC', b: 'Raspberry Pi 5', n: 'Central HPC' },
+    { id: 'adas', x: 18, y: 153, w: 252, h: 78, t: 'ADAS', b: 'NVIDIA Jetson Orin', n: 'ADAS' },
+    { id: 'cluster', x: 870, y: 153, w: 252, h: 78, t: 'Instrument cluster', b: 'Riverdi 5" · STM32U5', n: 'Cluster' },
+    { id: 'stm', cls: 'focus', x: 18, y: 380, w: 252, h: 76, t: 'ZC01 · Front body zone', b: 'STM32F407G-DISC1', n: 'ZC01' },
+    { id: 'door', x: 302, y: 380, w: 252, h: 76, t: 'Door / key zone', b: 'FPB-RA2E3', n: 'Door / key zone' },
+    { id: 's32', x: 586, y: 380, w: 252, h: 76, t: 'ZC02 · Rear body zone', b: 'FRDM-A-S32K344', n: 'ZC02' },
+    { id: 'ard', x: 870, y: 380, w: 252, h: 76, t: 'Sensor zone', b: 'Arduino + Ethernet shield', n: 'Sensor zone' },
+    { id: 'lin', x: 586, y: 500, w: 252, h: 76, t: 'LIN node', b: 'FRDM-MCXA156', n: 'LIN node' }
+  ];
+  var LINKS = [
+    { a: 'cloud', b: 'hpc', m: 'eth', d: 'M568 84 L568 150', lab: 'IP · MQTT / HTTPS' },
+    { a: 'hpc', b: 'adas', m: 'eth', d: 'M408 192 L270 192', lab: 'ETH · gRPC' },
+    { a: 'hpc', b: 'cluster', m: 'open', d: 'M728 192 L870 192', lab: 'CAN FD or ETH' },
+    { a: 'hpc', b: 'stm', m: 'can', d: 'M450 234 L144 380', lab: 'CAN 500 kbit/s' },
+    { a: 'hpc', b: 'door', m: 'can', d: 'M520 234 L428 380', lab: 'CAN · MCP2515' },
+    { a: 'hpc', b: 's32', m: 'can', d: 'M616 234 L712 380', lab: 'CAN FD' },
+    { a: 'hpc', b: 'ard', m: 'eth', d: 'M686 234 L996 380', lab: 'ETH · MQTT' },
+    { a: 's32', b: 'lin', m: 'lin', d: 'M712 456 L712 500', lab: 'LIN' }
+  ];
+  var byId = {}; NODES.forEach(function (n) { byId[n.id] = n; });
+
+  function el(n, a, p) { var e = document.createElementNS(NS, n); for (var k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; }
+  var gL = el('g', {}, svg), gP = el('g', {}, svg), gB = el('g', {}, svg), gN = el('g', {}, svg);
+  var nodeEls = {}, packets = [];
+
+  LINKS.forEach(function (k) {
+    var p = el('path', { d: k.d, class: 'lk ' + k.m }, gL);
+    k.path = p; k.len = p.getTotalLength();
+    var mid = p.getPointAtLength(k.len / 2);
+    var g = el('g', { class: 'lb' }, gB), t = el('text', { x: mid.x, y: mid.y + 4, 'text-anchor': 'middle' }, g);
+    t.textContent = k.lab;
+    var bb = t.getBBox(); var r = el('rect', { x: bb.x - 7, y: bb.y - 3, width: bb.width + 14, height: bb.height + 6 }, g); g.insertBefore(r, t);
+    k.lb = g;
+    [0, 0.5].forEach(function (ph, i) {
+      var c = el('circle', { r: 3.8, class: 'pk ' + k.m }, gP);
+      packets.push({ k: k, c: c, p: ph, dir: i ? -1 : 1, v: (k.m === 'open' ? 38 : k.m === 'lin' ? 30 : 75) });
+    });
+  });
+
+  NODES.forEach(function (n) {
+    var g = el('g', { class: 'nd ' + (n.cls || ''), tabindex: 0, role: 'button', 'aria-label': n.t + ', ' + n.b }, gN);
+    el('rect', { x: n.x, y: n.y, width: n.w, height: n.h }, g);
+    var t = el('text', { x: n.x + n.w / 2, y: n.y + n.h / 2 - 4, 'text-anchor': 'middle', class: 't' }, g); t.textContent = n.t;
+    var b = el('text', { x: n.x + n.w / 2, y: n.y + n.h / 2 + 20, 'text-anchor': 'middle', class: 'b' }, g); b.textContent = n.b;
+    g.addEventListener('click', function () { select(n.id); });
+    g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(n.id); } });
+    nodeEls[n.id] = g;
+  });
+
+  function select(id) {
+    Object.keys(nodeEls).forEach(function (k) { nodeEls[k].classList.toggle('sel', k === id); });
+    LINKS.forEach(function (k) {
+      var on = k.a === id || k.b === id;
+      k.path.classList.toggle('dim', !on); k.lb.classList.toggle('dim', !on);
+    });
+    packets.forEach(function (p) { p.c.classList.toggle('dim', !(p.k.a === id || p.k.b === id)); });
+    var n = byId[id];
+    cap.innerHTML = '<b>' + n.t + '</b><span class="bd">' + n.b + '</span>' +
+      LINKS.filter(function (k) { return k.a === id || k.b === id; }).map(function (k) {
+        var o = byId[k.a === id ? k.b : k.a];
+        return '<span class="cp"><i class="m ' + k.m + '"></i>' + o.n + ' · ' + k.lab + '</span>';
+      }).join('');
+  }
+  select('hpc');
+
+  function place(p) {
+    var f = p.dir > 0 ? p.p : 1 - p.p, pt = p.k.path.getPointAtLength(f * p.k.len);
+    p.c.setAttribute('cx', pt.x); p.c.setAttribute('cy', pt.y);
+  }
+  packets.forEach(place);
+  if (!reduce) {
+    var last = performance.now(), visible = true;
+    new IntersectionObserver(function (e) { visible = e[0].isIntersecting; }).observe(svg);
+    (function loop(now) {
+      var dt = Math.min((now - last) / 1000, .1); last = now;
+      if (visible) packets.forEach(function (p) { p.p += p.v * dt / p.k.len; if (p.p > 1) p.p -= 1; place(p); });
+      requestAnimationFrame(loop);
+    })(last);
+  }
+})();
+
+/* ---------- 3. Layered stack: top-to-bottom pulse ---------- */
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var host = document.getElementById('layers');
+  var rows = host.querySelectorAll('.r'), i = 0, visible = true;
+  new IntersectionObserver(function (e) { visible = e[0].isIntersecting; }).observe(host);
+  function tick() {
+    if (!visible) return;
+    rows.forEach(function (r, j) { r.classList.toggle('pulse', j === i); });
+    i = (i + 1) % (rows.length + 2);
+  }
+  if (!reduce) setInterval(tick, 650);
+})();
+
+/* ---------- 4. ZC01 vehicle state simulation ---------- */
+(function () {
+  var S = { vs: 'On', sig: 'ok', joy: 'N', hz: '0', missed: 0, zc: 'FOLLOW_ON' };
+  var $ = function (id) { return document.getElementById(id); };
+  var follow = function () { return 'FOLLOW_' + S.vs.toUpperCase(); };
+
+  function render() {
+    document.querySelectorAll('.seg').forEach(function (g) {
+      g.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.v === S[g.dataset.k])); });
+    });
+    document.querySelectorAll('#states .st').forEach(function (s) { s.classList.toggle('on', s.dataset.s === S.zc); });
+    document.querySelectorAll('#counter i').forEach(function (c, i) { c.classList.toggle('f', i < S.missed); });
+    $('cgwstate').textContent = S.vs;
+    $('wire').classList.toggle('lost', S.sig === 'lost');
+    var haz = S.hz === '1';
+    var turnActive = !haz && S.joy !== 'N' && (S.zc === 'FOLLOW_ON' || S.zc === 'FAILSAFE');
+    $('lampL').classList.toggle('blink', haz || (turnActive && S.joy === 'L'));
+    $('lampR').classList.toggle('blink', haz || (turnActive && S.joy === 'R'));
+    var msg;
+    if (haz) msg = 'Hazard lights active. They have priority over the turn indicators and are available in state ' + S.zc + '.';
+    else if (S.joy !== 'N' && S.zc === 'FOLLOW_UPDATE') msg = 'Turn request ignored in this simulation: the behaviour of the indicators in Update is an open point.';
+    else if (S.joy !== 'N' && S.zc === 'FOLLOW_OFF') msg = 'Turn indicators are inactive in Off.';
+    else if (turnActive && S.zc === 'FAILSAFE') msg = 'FAILSAFE: the turn indicator is driven locally by ZC01 without the gateway.';
+    else if (turnActive) msg = 'Turn indicator active in On.';
+    else if (S.zc === 'FAILSAFE') msg = 'FAILSAFE entered after five missed state messages. Hazard lights stay available and are not triggered automatically.';
+    else msg = 'ZC01 follows the vehicle state ' + S.vs + '.';
+    $('readout').textContent = msg;
+  }
+  function sync() { if (S.sig === 'ok' && S.zc !== 'FAILSAFE') S.zc = follow(); }
+  document.querySelectorAll('.seg').forEach(function (g) {
+    g.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      S[g.dataset.k] = b.dataset.v;
+      if (g.dataset.k === 'sig' && S.sig === 'ok') { S.missed = 0; S.zc = follow(); }
+      sync(); render();
+    });
+  });
+  setInterval(function () {
+    if (S.sig === 'ok') { S.missed = 0; S.zc = follow(); }
+    else { S.missed = Math.min(S.missed + 1, 5); if (S.missed >= 5) S.zc = 'FAILSAFE'; }
+    render();
+  }, 700);
+  render();
+})();
+
+/* ---------- 5. Documentation portal ---------- */
+(function () {
+  var side = document.querySelector('.pside'); if (!side) return;
+  var btns = [].slice.call(side.querySelectorAll('button[data-p]'));
+  var panels = [].slice.call(document.querySelectorAll('.panel'));
+  var toc = document.getElementById('ptoc'), url = document.getElementById('purl'), main = document.getElementById('pmain');
+  var ROUTES = { bom:'hardware/bom/', wiring:'hardware/wiring/', guides:'guides/', arc:'architecture/', logical:'architecture/logical/', software:'architecture/software/', network:'architecture/network/', deploy:'architecture/deployment/', adr:'adr/', req:'requirements-management/', devlog:'devlog/', index:'docs/' };
+  function show(id, keepScroll) {
+    btns.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.p === id ? 'true' : 'false'); });
+    panels.forEach(function (p) { p.hidden = p.id !== 'p-' + id; });
+    url.textContent = ROUTES[id] || '';
+    toc.innerHTML = '';
+    var pn = document.getElementById('p-' + id);
+    [].forEach.call(pn.querySelectorAll('h3'), function (h, i) {
+      h.id = 'p-' + id + '-h' + i;
+      var li = document.createElement('li'), a = document.createElement('a');
+      a.textContent = h.textContent; a.addEventListener('click', function () { h.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+      li.appendChild(a); toc.appendChild(li);
+    });
+    if (!keepScroll) main.scrollTop = 0;
+  }
+  btns.forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.p); }); });
+  var q = document.getElementById('pq');
+  q.addEventListener('input', function () {
+    var v = q.value.toLowerCase().trim();
+    btns.forEach(function (b) { b.style.display = !v || b.textContent.toLowerCase().indexOf(v) > -1 ? '' : 'none'; });
+  });
+  show('bom', true);
+})();
+</script>
+</body>
+</html>
